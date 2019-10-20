@@ -1,0 +1,81 @@
+﻿@page "/"
+@inject ShowsService _showsService
+
+@if (_login != null)
+{
+	<div class="w-100 text-center">
+		<a class="btn btn-primary"
+		   href="@_login">
+			Login
+		</a>
+	</div>
+}
+else if (_shows != null)
+{
+	<table class="table">
+		@foreach (var show in _shows)
+		{
+			<tr class="text-nowrap @GetRowClass(show.EpisodeDate)">
+				<td class="font-weight-bold w-100">
+					@show.ShowTitle
+				</td>
+				<td class="text-right w-100">
+					@show.EpisodeTitle
+				</td>
+				<td class="text-center">
+					@show.EpisodeNumber
+				</td>
+				<td class="text-center">
+					@show.EpisodeDate.ToShortDateString()
+				</td>
+				<td class="py-0 align-middle">
+					<a class="btn btn-outline-primary"
+					   href="https://rarbgtorrents.org/torrents.php?search=@show.ShowTitle+@show.EpisodeNumber+1080p"
+					   target="_blank">
+						<i class="fas fa-search fa-fw fa-lg"></i>
+					</a>
+					<a class="btn btn-outline-primary"
+					   href="https://www.addic7ed.com/srch.php?search=@show.ShowTitle+@show.EpisodeNumber"
+					   target="_blank">
+						<i class="fas fa-closed-captioning fa-fw fa-lg"></i>
+					</a>
+				</td>
+			</tr>
+		}
+	</table>
+}
+
+@code {
+	public const string TabName = nameof(Shows);
+	public const string TabUrl = null;
+
+	private string _login;
+	private IEnumerable<ShowModel> _shows;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_login = _showsService.Login();
+		if (_login == null)
+		{
+			_shows = await _showsService.GetShowsAsync();
+		}
+	}
+
+	private string GetRowClass(DateTime date)
+	{
+		var today = DateTime.Today;
+		if (date.Date < today.AddDays(-1))
+		{
+			return "bg-danger";
+		}
+		if (date.Date < today)
+		{
+			return "bg-warning";
+		}
+		if (date.Date == today)
+		{
+			return "bg-success";
+		}
+		return null;
+	}
+}
