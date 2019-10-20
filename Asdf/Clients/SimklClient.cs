@@ -41,9 +41,33 @@ namespace Asdf.Clients
 			_config.Save();
 		}
 
-		public Task<SimklShowsResponse> GetShows()
+		public Task<SimklShowsResponse> GetShowsAsync()
 		{
 			return PostAsync<SimklShowsResponse>("sync/all-items/shows/watching");
+		}
+
+		public Task WatchShowAsync(string title, int id, int season, int episode)
+		{
+			var request = new SimklWatchRequest
+			{
+				shows = new[]
+				{
+					new SimklWatchRequestItem
+					{
+						title = title,
+						ids = new SimklWatchRequestItemIds { simkl = id },
+						seasons = new []
+						{
+							new SimklWatchRequestItemSeasons
+							{
+								number = season,
+								episodes = new [] { new SimklWatchRequestItemEpisode { number = episode} }
+							}
+						}
+					}
+				}
+			};
+			return PostAsync<SimklResponse, SimklWatchRequest>("sync/history", request);
 		}
 
 		public string GetLoginUrl()

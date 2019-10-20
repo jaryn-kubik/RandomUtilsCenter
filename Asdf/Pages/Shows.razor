@@ -15,7 +15,7 @@ else if (_shows != null)
 	<table class="table">
 		@foreach (var show in _shows)
 		{
-			<tr class="text-nowrap @GetRowClass(show.EpisodeDate)">
+			<tr class="text-nowrap @GetRowClass(show.Date)">
 				<td class="font-weight-bold w-100">
 					@show.ShowTitle
 				</td>
@@ -23,19 +23,23 @@ else if (_shows != null)
 					@show.EpisodeTitle
 				</td>
 				<td class="text-center">
-					@show.EpisodeNumber
+					@show.SeasonEpisode
 				</td>
 				<td class="text-center">
-					@show.EpisodeDate.ToShortDateString()
+					@show.Date.ToShortDateString()
 				</td>
 				<td class="py-0 align-middle">
+					<button class="btn btn-outline-primary @(show.IsWatchable ? "visible" : "invisible")"
+							@onclick="@(async () => await OnWatchAsync(show))">
+						<i class="fas fa-check fa-fw fa-lg"></i>
+					</button>
 					<a class="btn btn-outline-primary"
-					   href="https://rarbgtorrents.org/torrents.php?search=@show.ShowTitle+@show.EpisodeNumber+1080p"
+					   href="https://rarbgtorrents.org/torrents.php?search=@show.ShowTitle+@show.SeasonEpisode+1080p"
 					   target="_blank">
 						<i class="fas fa-search fa-fw fa-lg"></i>
 					</a>
 					<a class="btn btn-outline-primary"
-					   href="https://www.addic7ed.com/srch.php?search=@show.ShowTitle+@show.EpisodeNumber"
+					   href="https://www.addic7ed.com/srch.php?search=@show.ShowTitle+@show.SeasonEpisode"
 					   target="_blank">
 						<i class="fas fa-closed-captioning fa-fw fa-lg"></i>
 					</a>
@@ -59,6 +63,12 @@ else if (_shows != null)
 		{
 			_shows = await _showsService.GetShowsAsync();
 		}
+	}
+
+	private async Task OnWatchAsync(ShowModel show)
+	{
+		await _showsService.WatchAsync(show);
+		_shows = await _showsService.GetShowsAsync();
 	}
 
 	private string GetRowClass(DateTime date)

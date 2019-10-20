@@ -4,9 +4,17 @@ namespace Asdf.Services
 {
 	public class ShowModel
 	{
+		public int Id { get; set; }
+
 		public string ShowTitle { get; set; }
 		public string EpisodeTitle { get; set; }
-		public string EpisodeNumber { get; set; }
-		public DateTime EpisodeDate { get; set; }
+
+		public int Season { get; set; }
+		public int Episode { get; set; }
+
+		public DateTime Date { get; set; }
+		public bool IsWatchable { get; set; }
+
+		public string SeasonEpisode => $"S{Season:D2}E{Episode:D2}";
 	}
 }
