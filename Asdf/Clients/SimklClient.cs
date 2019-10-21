@@ -8,18 +8,16 @@ using System.Threading.Tasks;
 
 namespace Asdf.Clients
 {
-	public class SimklClient
+	public class SimklClient : BaseClient
 	{
 		public const string ApiUrl = "https://api.simkl.com";
 
-		private readonly HttpClient _client;
 		private readonly LinkGenerator _linkGenerator;
 		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly ConfigService _config;
 
-		public SimklClient(HttpClient client, LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, ConfigService config)
+		public SimklClient(HttpClient client, LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, ConfigService config) : base(client)
 		{
-			_client = client;
 			_linkGenerator = linkGenerator;
 			_httpContextAccessor = httpContextAccessor;
 			_config = config;
@@ -84,25 +82,25 @@ namespace Asdf.Clients
 
 		private async Task<TResponse> PostAsync<TResponse>(string url) where TResponse : SimklResponse
 		{
-			return await PostAsyncInt<TResponse>(() => _client.PostAsync(url, null));
+			return await PostAsyncInt<TResponse>(() => PostAsync(url));
 		}
 
 		private async Task<TResponse> PostAsync<TResponse, TRequest>(string url, TRequest request) where TResponse : SimklResponse
 		{
-			return await PostAsyncInt<TResponse>(() => _client.PostJsonAsync(url, request));
+			return await PostAsyncInt<TResponse>(() => PostJsonAsync(url, request));
 		}
 
 		private async Task<TResponse> PostAsyncInt<TResponse>(Func<Task<HttpResponseMessage>> action) where TResponse : SimklResponse
 		{
 			if (_config.SimklToken != null)
 			{
-				_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _config.SimklToken);
-				_client.DefaultRequestHeaders.Remove("simkl-api-key");
-				_client.DefaultRequestHeaders.Add("simkl-api-key", _config.SimklClientID);
+				Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.SimklToken);
+				Headers.Remove("simkl-api-key");
+				Headers.Add("simkl-api-key", _config.SimklClientID);
 			}
 
 			var response = await action();
-			var result = await response.ReadAsJsonAsync<TResponse>();
+			var result = await ReadAsJsonAsync<TResponse>(response);
 
 			if (result.error == null)
 			{

@@ -17,4 +17,14 @@ namespace Asdf.Services
 
 		public string SeasonEpisode => $"S{Season:D2}E{Episode:D2}";
 	}
+
+	public class EpisodeModel
+	{
+		public string EpisodeTitle { get; set; }
+
+		public int Season { get; set; }
+		public int Episode { get; set; }
+
+		public DateTime Date { get; set; }
+	}
 }

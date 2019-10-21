@@ -10,7 +10,18 @@
 		</a>
 	</div>
 }
-else if (_shows != null)
+<div class="d-flex w-100 justify-content-end align-items-center mb-1">
+	@if (_busy)
+	{
+		<div class="spinner-border mx-3"></div>
+	}
+	<button class="btn btn-primary"
+			@onclick="@(() => OnReloadAsync())"
+			disabled="@_busy">
+		Reload
+	</button>
+</div>
+@if (_shows != null)
 {
 	<table class="table">
 		@foreach (var show in _shows)
@@ -29,16 +40,17 @@ else if (_shows != null)
 					@show.Date.ToShortDateString()
 				</td>
 				<td class="py-0 align-middle">
-					<button class="btn btn-outline-primary @(show.IsWatchable ? "visible" : "invisible")"
-							@onclick="@(async () => await OnWatchAsync(show))">
+					<button class="btn btn-primary @(show.IsWatchable ? "visible" : "invisible")"
+							@onclick="@(() => OnWatchAsync(show))"
+							disabled="@_busy">
 						<i class="fas fa-check fa-fw fa-lg"></i>
 					</button>
-					<a class="btn btn-outline-primary"
+					<a class="btn btn-secondary"
 					   href="https://rarbgtorrents.org/torrents.php?search=@show.ShowTitle+@show.SeasonEpisode+1080p"
 					   target="_blank">
 						<i class="fas fa-search fa-fw fa-lg"></i>
 					</a>
-					<a class="btn btn-outline-primary"
+					<a class="btn btn-secondary"
 					   href="https://www.addic7ed.com/srch.php?search=@show.ShowTitle+@show.SeasonEpisode"
 					   target="_blank">
 						<i class="fas fa-closed-captioning fa-fw fa-lg"></i>
@@ -51,24 +63,36 @@ else if (_shows != null)
 
 @code {
 	public const string TabName = nameof(Shows);
-	public const string TabUrl = null;
+	public const string TabUrl = "";
 
 	private string _login;
 	private IEnumerable<ShowModel> _shows;
+	private bool _busy;
 
 	protected override async Task OnInitializedAsync()
 	{
+		_busy = true;
 		_login = _showsService.Login();
 		if (_login == null)
 		{
 			_shows = await _showsService.GetShowsAsync();
 		}
+		_busy = false;
+	}
+
+	private async Task OnReloadAsync()
+	{
+		_busy = true;
+		_shows = await _showsService.GetShowsAsync(true);
+		_busy = false;
 	}
 
 	private async Task OnWatchAsync(ShowModel show)
 	{
+		_busy = true;
 		await _showsService.WatchAsync(show);
-		_shows = await _showsService.GetShowsAsync();
+		_shows = await _showsService.GetShowsAsync(true);
+		_busy = false;
 	}
 
 	private string GetRowClass(DateTime date)

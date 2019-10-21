@@ -7,19 +7,17 @@ using System.Threading.Tasks;
 
 namespace Asdf.Clients
 {
-	public class TmdbClient
+	public class TmdbClient : BaseClient
 	{
 		public const string ApiUrl = "https://api.themoviedb.org/";
 		private static int _limitRemaining;
 		private static long _limitReset;
 
-		private readonly HttpClient _client;
 		private readonly ConfigService _config;
 		private readonly ILogger<TmdbClient> _log;
 
-		public TmdbClient(HttpClient client, ConfigService config, ILogger<TmdbClient> log)
+		public TmdbClient(HttpClient client, ConfigService config, ILogger<TmdbClient> log) : base(client)
 		{
-			_client = client;
 			_config = config;
 			_log = log;
 		}
@@ -47,7 +45,7 @@ namespace Asdf.Clients
 				}
 			}
 
-			var response = await _client.GetAsync($"{url}?api_key={_config.TmdbApiKey}");
+			var response = await GetAsync($"{url}?api_key={_config.TmdbApiKey}");
 			if (!response.Headers.TryGetValues("X-RateLimit-Remaining", out var valuesRemaining) || !int.TryParse(valuesRemaining.FirstOrDefault(), out _limitRemaining))
 			{
 				_limitRemaining = 0;
@@ -57,7 +55,7 @@ namespace Asdf.Clients
 				_limitReset = 0;
 			}
 
-			var result = await response.ReadAsJsonAsync<TResponse>();
+			var result = await ReadAsJsonAsync<TResponse>(response);
 			if (result.status_message == null)
 			{
 				return result;

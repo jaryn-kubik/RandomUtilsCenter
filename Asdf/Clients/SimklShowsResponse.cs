@@ -27,8 +27,6 @@ namespace Asdf.Clients
 	public class SimklShowsResponseItemDetail
 	{
 		public string title { get; set; }
-		public string poster { get; set; }
-		public int year { get; set; }
 
 		public SimklShowsResponseItemIds ids { get; set; }
 	}

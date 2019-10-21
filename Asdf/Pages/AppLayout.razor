@@ -1,24 +1,24 @@
 ﻿@inherits LayoutComponentBase
 
-<nav class="navbar navbar-expand navbar-dark bg-primary sticky-top">
+<nav class="navbar navbar-expand navbar-dark bg-primary sticky-top py-0">
 	<ul class="navbar-nav mr-auto">
-		<li class="nav-item px-3">
-			<NavLink class="nav-link" href="@Shows.TabUrl" Match="NavLinkMatch.All">@Shows.TabName</NavLink>
+		<li class="nav-item">
+			<NavLink class="nav-link p-4" href="@Shows.TabUrl" Match="NavLinkMatch.All">@Shows.TabName</NavLink>
 		</li>
-		<li class="nav-item px-3">
-			<NavLink class="nav-link" href="torrents">Torrents</NavLink>
+		<li class="nav-item">
+			<NavLink class="nav-link p-4" href="torrents">Torrents</NavLink>
 		</li>
-		<li class="nav-item px-3">
-			<NavLink class="nav-link" href="debrid">Debrid</NavLink>
+		<li class="nav-item">
+			<NavLink class="nav-link p-4" href="debrid">Debrid</NavLink>
 		</li>
-		<li class="nav-item px-3">
-			<NavLink class="nav-link" href="downloads">Downloads</NavLink>
+		<li class="nav-item">
+			<NavLink class="nav-link p-4" href="downloads">Downloads</NavLink>
 		</li>
-		<li class="nav-item px-3">
-			<NavLink class="nav-link" href="subtitles">Subtitles</NavLink>
+		<li class="nav-item">
+			<NavLink class="nav-link p-4" href="subtitles">Subtitles</NavLink>
 		</li>
 	</ul>
 </nav>
-<main class="p-5">
+<main class="px-5 py-3">
 	@Body
 </main>
