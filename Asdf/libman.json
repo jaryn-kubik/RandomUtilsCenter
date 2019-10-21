@@ -6,7 +6,6 @@
 			"library": "bootswatch@4.3.1",
 			"destination": "wwwroot/css",
 			"files": [
-				"darkly/bootstrap.css",
 				"darkly/bootstrap.min.css"
 			]
 		},

@@ -37,7 +37,7 @@
 					@show.SeasonEpisode
 				</td>
 				<td class="text-center">
-					@show.Date.ToShortDateString()
+					@show.Date.ToString("yyyy-MM-dd")
 				</td>
 				<td class="py-0 align-middle">
 					<button class="btn btn-primary @(show.IsWatchable ? "visible" : "invisible")"

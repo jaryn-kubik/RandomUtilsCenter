@@ -14,6 +14,7 @@ namespace Asdf
 		public static void Main(string[] args)
 		{
 			Host.CreateDefaultBuilder(args)
+				.UseWindowsService()
 				.ConfigureLogging(x => x.AddProvider(new LoggerProvider()))
 				.ConfigureWebHostDefaults(x => x.UseStartup<Startup>())
 				.Build()
@@ -36,10 +37,7 @@ namespace Asdf
 		public void Configure(IApplicationBuilder app)
 		{
 			app.UseDeveloperExceptionPage();
-
-			app.UseHttpsRedirection();
 			app.UseStaticFiles();
-
 			app.UseRouting();
 			app.UseEndpoints(x =>
 			{

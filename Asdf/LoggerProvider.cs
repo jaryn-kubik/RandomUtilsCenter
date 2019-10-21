@@ -70,7 +70,7 @@ namespace Asdf
 		{
 			lock (_syncRoot)
 			{
-				var timestamp = DateTime.Now.ToString();
+				var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
 				var level = logLevel.ToString().ToUpperInvariant().PadRight(11);
 				var category = _categoryName.Substring(Math.Max(0, _categoryName.Length - 60)).PadRight(60);
 				var msg = formatter(state, exception);
