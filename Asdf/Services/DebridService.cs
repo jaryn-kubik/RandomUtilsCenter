@@ -33,7 +33,7 @@ namespace Asdf.Services
 			}
 
 			var items = await _client.GetTorrentsAsync();
-			var result = items.torrents.Values.Select(x => new DebridModel
+			var result = items.torrents?.Values?.Select(x => new DebridModel
 			{
 				Id = x.id,
 				Name = x.filename,
@@ -47,9 +47,12 @@ namespace Asdf.Services
 					Link = y.link,
 					Size = y.size
 				})?.OrderByDescending(y => y.Size)
-			}).OrderBy(x => x.StatusType).ThenBy(x => x.Name);
+			});
 
-			_items.AddRange(result);
+			if (result != null)
+			{
+				_items.AddRange(result.OrderBy(x => x.StatusType).ThenBy(x => x.Name));
+			}
 			return _items;
 		}
 

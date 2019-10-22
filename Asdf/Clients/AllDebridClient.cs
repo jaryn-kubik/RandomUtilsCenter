@@ -43,7 +43,7 @@ namespace Asdf.Clients
 
 		public Task<AllDebridTorrentsResponse> GetTorrentsAsync()
 		{
-			return GetAsync<AllDebridTorrentsResponse>($"magnet/status?agent={Agent}&token={_config.AllDebridToken}&apiVersion=2");
+			return GetAsync<AllDebridTorrentsResponse>($"magnet/status?agent={Agent}&token={_config.AllDebridToken}&apiVersion=2", 55);
 		}
 
 		public Task DeleteAsync(long id)
@@ -51,11 +51,11 @@ namespace Asdf.Clients
 			return GetAsync<AllDebridResponse>($"magnet/delete?agent={Agent}&token={_config.AllDebridToken}&id={id}");
 		}
 
-		private async Task<TResponse> GetAsync<TResponse>(string url) where TResponse : AllDebridResponse
+		private async Task<TResponse> GetAsync<TResponse>(string url, int? ignoreError = null) where TResponse : AllDebridResponse
 		{
 			var response = await GetAsync(url);
 			var result = await ReadAsJsonAsync<TResponse>(response);
-			if (result.error == null)
+			if (result.error == null || result.errorCode == ignoreError)
 			{
 				return result;
 			}
