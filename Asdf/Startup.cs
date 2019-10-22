@@ -29,9 +29,13 @@ namespace Asdf
 			services.AddServerSideBlazor();
 
 			services.AddSingleton(ConfigService.Load());
+
 			services.AddScoped<ShowsService>();
 			services.AddHttpClient<SimklClient>(x => x.BaseAddress = new Uri(SimklClient.ApiUrl));
 			services.AddHttpClient<TmdbClient>(x => x.BaseAddress = new Uri(TmdbClient.ApiUrl));
+
+			services.AddScoped<DebridService>();
+			services.AddHttpClient<AllDebridClient>(x => x.BaseAddress = new Uri(AllDebridClient.ApiUrl));
 		}
 
 		public void Configure(IApplicationBuilder app)

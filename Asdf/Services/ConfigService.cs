@@ -7,10 +7,10 @@ namespace Asdf.Services
 	{
 		private string FilePath { get; set; }
 
+		public string AllDebridToken { get; set; }
 		public string SimklClientID { get; set; }
 		public string SimklClientSecret { get; set; }
 		public string SimklToken { get; set; }
-
 		public string TmdbApiKey { get; set; }
 
 		public void Save()

@@ -9,7 +9,7 @@ namespace Asdf.Clients
 {
 	public class TmdbClient : BaseClient
 	{
-		public const string ApiUrl = "https://api.themoviedb.org/";
+		public const string ApiUrl = "https://api.themoviedb.org";
 		private static int _limitRemaining;
 		private static long _limitReset;
 
