@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Asdf
+﻿namespace Asdf
 {
 	public static class Utils
 	{
@@ -10,8 +8,7 @@ namespace Asdf
 			{
 				(1000 * 1000 * 1000L, "GB"),
 				(1000 * 1000L, "MB"),
-				(1000L, "KB"),
-				(1L, "B")
+				(1000L, "KB")
 			};
 
 			foreach (var (size, suffix) in sizes)
@@ -21,7 +18,7 @@ namespace Asdf
 					return $"{(decimal)value / size:F2} {suffix}";
 				}
 			}
-			throw new NotSupportedException();
+			return $"{value:F2} B";
 		}
 	}
 }
