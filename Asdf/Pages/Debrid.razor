@@ -44,7 +44,7 @@ else
 						@(Utils.BytesToString(item.SizeCurrent))
 					</td>
 					<td class="text-right">
-						@((item.SizeCurrent / (decimal)item.SizeTotal * 100).ToString("F2"))%
+						@((item.SizeTotal > 0 ? (item.SizeCurrent / (decimal)item.SizeTotal * 100) : 0).ToString("F2"))%
 					</td>
 					<td class="text-center">
 						@item.Status

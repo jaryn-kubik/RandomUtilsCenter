@@ -46,7 +46,7 @@ namespace Asdf.Services
 					Name = y.filename,
 					Link = y.link,
 					Size = y.size
-				})?.OrderByDescending(y => y.Size)
+				})?.OrderBy(y => y.Name).ThenByDescending(y => y.Size)
 			});
 
 			if (result != null)
