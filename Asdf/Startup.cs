@@ -26,7 +26,7 @@ namespace Asdf
 			services.AddHttpContextAccessor();
 			services.AddControllers();
 			services.AddRazorPages();
-			services.AddServerSideBlazor();
+			services.AddServerSideBlazor(x => x.DetailedErrors = true);
 
 			services.AddSingleton(ConfigService.Load());
 

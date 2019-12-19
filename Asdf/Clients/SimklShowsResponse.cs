@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Asdf.Clients
 {
@@ -10,8 +9,6 @@ namespace Asdf.Clients
 
 	public class SimklShowsResponseItem
 	{
-		public DateTime last_watched_at { get; set; }
-
 		public string status { get; set; }
 		public string user_rating { get; set; }
 		public string last_watched { get; set; }
