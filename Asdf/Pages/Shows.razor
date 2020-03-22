@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/shows"
 @inject ShowsService _showsService
 
 @if (_login != null)
@@ -13,12 +13,9 @@
 else
 {
 	<div class="d-flex w-100 justify-content-end align-items-center mb-1">
-		@if (_busy)
-		{
-			<div class="spinner-border mx-3"></div>
-		}
+		<div class="spinner-border mx-3 @(_busy ? "visible" : "invisible")"></div>
 		<button class="btn btn-primary"
-				@onclick="@(() => OnReloadAsync())"
+				@onclick="OnReloadAsync"
 				disabled="@_busy">
 			Reload
 		</button>
@@ -66,9 +63,6 @@ else
 }
 
 @code {
-	public const string TabName = nameof(Shows);
-	public const string TabUrl = "";
-
 	private string _login;
 	private IEnumerable<ShowModel> _shows;
 	private bool _busy;

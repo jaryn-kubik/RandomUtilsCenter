@@ -15,12 +15,14 @@
 else
 {
 	<div class="d-flex w-100 justify-content-end align-items-center mb-1">
-		@if (_busy)
-		{
-			<div class="spinner-border mx-3"></div>
-		}
 		<button class="btn btn-primary"
-				@onclick="@(() => OnReloadAsync())"
+				@onclick="OnDownloadAll"
+				disabled="@_busy">
+			Download All
+		</button>
+		<div class="spinner-border mx-3 @(_busy ? "visible" : "invisible")"></div>
+		<button class="btn btn-primary"
+				@onclick="OnReloadAsync"
 				disabled="@_busy">
 			Reload
 		</button>
@@ -85,9 +87,6 @@ else
 }
 
 @code {
-	public const string TabName = nameof(Debrid);
-	public const string TabUrl = "debrid";
-
 	private string _login;
 	private IEnumerable<DebridModel> _items;
 	private bool _busy;
@@ -107,6 +106,15 @@ else
 	{
 		_busy = true;
 		_items = await _debridService.GetItemsAsync(true);
+		_busy = false;
+	}
+
+	private async Task OnDownloadAll()
+	{
+		_busy = true;
+		var files = _items.SelectMany(x => x.Files).Where(x => x.Size > 5 * 1000 * 1000).Select(x => x.Link);
+		await _js.InvokeVoidAsync("navigator.clipboard.writeText", string.Join('\n', files));
+		await Task.Delay(250);
 		_busy = false;
 	}
 

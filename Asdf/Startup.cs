@@ -30,6 +30,9 @@ namespace Asdf
 
 			services.AddSingleton(ConfigService.Load());
 
+			services.AddHostedService<JDownloaderService>();
+			services.AddScoped<DownloadsService>();
+
 			services.AddScoped<ShowsService>();
 			services.AddHttpClient<SimklClient>(x => x.BaseAddress = new Uri(SimklClient.ApiUrl));
 			services.AddHttpClient<TmdbClient>(x => x.BaseAddress = new Uri(TmdbClient.ApiUrl));

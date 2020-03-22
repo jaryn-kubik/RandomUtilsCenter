@@ -13,6 +13,10 @@ namespace Asdf.Services
 		public string SimklToken { get; set; }
 		public string TmdbApiKey { get; set; }
 
+		public string JDownloaderDir { get; set; }
+		public string JDownloaderUserName { get; set; }
+		public string JDownloaderPassword { get; set; }
+
 		public void Save()
 		{
 			var data = JsonSerializer.SerializeToUtf8Bytes(this, new JsonSerializerOptions { WriteIndented = true });
