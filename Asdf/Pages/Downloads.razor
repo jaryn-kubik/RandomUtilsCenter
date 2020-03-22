@@ -43,16 +43,15 @@ else
 	private IEnumerable<DownloadModel> _items;
 	private bool _busy = true;
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
-		_login = _downloadsService.Login();
+		_login = await _downloadsService.LoginAsync();
 		OnReload();
-
 	}
 
-	private void OnLogin()
+	private async Task OnLogin()
 	{
-		_login = _downloadsService.Login(_loginUserName, _loginPassword);
+		_login = await _downloadsService.LoginAsync(_loginUserName, _loginPassword);
 		OnReload();
 	}
 

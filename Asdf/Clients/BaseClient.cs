@@ -28,11 +28,16 @@ namespace Asdf.Clients
 			return _client.PostAsync(url, null);
 		}
 
+		protected Task<HttpResponseMessage> PostAsync(string url, string data, string mediaType)
+		{
+			var content = new StringContent(data, Encoding.UTF8, mediaType);
+			return _client.PostAsync(url, content);
+		}
+
 		protected Task<HttpResponseMessage> PostJsonAsync<T>(string url, T data)
 		{
 			var serialized = JsonSerializer.Serialize(data);
-			var content = new StringContent(serialized, Encoding.UTF8, MediaTypeNames.Application.Json);
-			return _client.PostAsync(url, content);
+			return PostAsync(url, serialized, MediaTypeNames.Application.Json);
 		}
 
 		protected async Task<T> ReadAsJsonAsync<T>(HttpResponseMessage response)

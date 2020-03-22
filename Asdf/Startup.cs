@@ -1,4 +1,5 @@
 using Asdf.Clients.AllDebrid;
+using Asdf.Clients.JDownloader;
 using Asdf.Clients.Simkl;
 using Asdf.Clients.Tmdb;
 using Asdf.Services;
@@ -34,6 +35,7 @@ namespace Asdf
 
 			services.AddHostedService<JDownloaderService>();
 			services.AddScoped<DownloadsService>();
+			services.AddHttpClient<JDownloaderClient>(x => x.BaseAddress = new Uri(JDownloaderClient.ApiUrl));
 
 			services.AddScoped<ShowsService>();
 			services.AddHttpClient<SimklClient>(x => x.BaseAddress = new Uri(SimklClient.ApiUrl));
