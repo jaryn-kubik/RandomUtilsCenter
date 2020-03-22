@@ -1,4 +1,4 @@
-﻿namespace Asdf.Clients
+﻿namespace Asdf.Clients.Simkl
 {
 	public class SimklAuthRequest
 	{

@@ -1,4 +1,4 @@
-﻿using Asdf.Clients;
+﻿using Asdf.Clients.AllDebrid;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

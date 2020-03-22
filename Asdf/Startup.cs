@@ -1,4 +1,6 @@
-using Asdf.Clients;
+using Asdf.Clients.AllDebrid;
+using Asdf.Clients.Simkl;
+using Asdf.Clients.Tmdb;
 using Asdf.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

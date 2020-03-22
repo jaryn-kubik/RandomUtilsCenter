@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Asdf.Clients
+namespace Asdf.Clients.Tmdb
 {
 	public class TmdbClient : BaseClient
 	{

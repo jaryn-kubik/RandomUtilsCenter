@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace Asdf.Clients
+namespace Asdf.Clients.Simkl
 {
 	public class SimklClient : BaseClient
 	{

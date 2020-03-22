@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Asdf.Clients
+namespace Asdf.Clients.Simkl
 {
 	public class SimklShowsResponse : SimklResponse
 	{

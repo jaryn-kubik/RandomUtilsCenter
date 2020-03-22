@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Asdf.Clients
+namespace Asdf.Clients.AllDebrid
 {
 	public class AllDebridTorrentsResponse : AllDebridResponse
 	{

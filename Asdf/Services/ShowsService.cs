@@ -1,4 +1,5 @@
-﻿using Asdf.Clients;
+﻿using Asdf.Clients.Simkl;
+using Asdf.Clients.Tmdb;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;

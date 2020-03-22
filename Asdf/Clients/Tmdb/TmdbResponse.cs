@@ -1,4 +1,4 @@
-﻿namespace Asdf.Clients
+﻿namespace Asdf.Clients.Tmdb
 {
 	public class TmdbResponse
 	{

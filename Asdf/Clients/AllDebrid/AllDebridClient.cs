@@ -3,7 +3,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Asdf.Clients
+namespace Asdf.Clients.AllDebrid
 {
 	public class AllDebridClient : BaseClient
 	{
