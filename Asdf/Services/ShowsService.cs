@@ -54,17 +54,17 @@ namespace Asdf.Services
 					var idSeason = episode.Groups[1].Value;
 					var idEpisode = episode.Groups[2].Value;
 
-					var episodeInfo = await _episodeInfo.GetOrCreateAsync($"{item.show.ids.simkl}S{idSeason:D2}E{idEpisode:D2}", _ => _tmbd.GetEpisodeAsync(item.show.ids.tmdb, idSeason, idEpisode));
+					var episodeInfo = item.show.ids.tmdb == null ? null : await _episodeInfo.GetOrCreateAsync($"{item.show.ids.simkl}S{idSeason:D2}E{idEpisode:D2}", _ => _tmbd.GetEpisodeAsync(item.show.ids.tmdb, idSeason, idEpisode));
 					_shows.Add(new ShowModel
 					{
 						Id = item.show.ids.simkl,
 						ShowTitle = item.show.title,
-						EpisodeTitle = episodeInfo.name,
+						EpisodeTitle = episodeInfo?.name,
 
-						Season = episodeInfo.season_number,
-						Episode = episodeInfo.episode_number,
+						Season = episodeInfo?.season_number ?? (int.TryParse(idSeason, out var seasonNumber) ? seasonNumber : 0),
+						Episode = episodeInfo?.episode_number ?? (int.TryParse(idEpisode, out var episodeNumber) ? episodeNumber : 0),
 
-						Date = DateTime.Parse(episodeInfo.air_date).AddDays(1),
+						Date = episodeInfo == null ? default : DateTime.Parse(episodeInfo.air_date).AddDays(1),
 						IsWatchable = true
 					});
 				}

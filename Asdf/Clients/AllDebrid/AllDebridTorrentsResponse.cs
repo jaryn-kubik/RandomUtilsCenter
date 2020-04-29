@@ -2,9 +2,9 @@
 
 namespace Asdf.Clients.AllDebrid
 {
-	public class AllDebridTorrentsResponse : AllDebridResponse
+	public class AllDebridTorrentsResponse
 	{
-		public Dictionary<string, AllDebridTorrentsResponseItem> torrents { get; set; }
+		public IEnumerable<AllDebridTorrentsResponseItem> magnets { get; set; }
 	}
 
 	public class AllDebridTorrentsResponseItem

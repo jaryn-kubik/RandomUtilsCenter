@@ -33,7 +33,7 @@ namespace Asdf.Services
 			}
 
 			var items = await _client.GetTorrentsAsync();
-			var result = items.torrents?.Values?.Select(x => new DebridModel
+			var result = items.magnets?.Select(x => new DebridModel
 			{
 				Id = x.id,
 				Name = x.filename,

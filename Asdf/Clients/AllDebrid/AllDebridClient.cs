@@ -28,38 +28,38 @@ namespace Asdf.Clients.AllDebrid
 			if (_check_url != null)
 			{
 				var check = await GetAsync<AllDebridLoginCheckResponse>(_check_url);
-				if (check.token != null)
+				if (check.apikey != null)
 				{
-					_config.AllDebridToken = check.token;
+					_config.AllDebridToken = check.apikey;
 					_config.Save();
 					return null;
 				}
 			}
 
-			var result = await GetAsync<AllDebridLoginResponse>($"pin/get?agent={Agent}");
+			var result = await GetAsync<AllDebridLoginResponse>($"v4/pin/get?agent={Agent}");
 			_check_url = result.check_url;
 			return result.user_url;
 		}
 
 		public Task<AllDebridTorrentsResponse> GetTorrentsAsync()
 		{
-			return GetAsync<AllDebridTorrentsResponse>($"magnet/status?agent={Agent}&token={_config.AllDebridToken}&apiVersion=2", 55);
+			return GetAsync<AllDebridTorrentsResponse>($"v4/magnet/status?agent={Agent}&apikey={_config.AllDebridToken}");
 		}
 
 		public Task DeleteAsync(long id)
 		{
-			return GetAsync<AllDebridResponse>($"magnet/delete?agent={Agent}&token={_config.AllDebridToken}&id={id}");
+			return GetAsync<object>($"v4/magnet/delete?agent={Agent}&apikey={_config.AllDebridToken}&id={id}");
 		}
 
-		private async Task<TResponse> GetAsync<TResponse>(string url, int? ignoreError = null) where TResponse : AllDebridResponse
+		private async Task<TResponse> GetAsync<TResponse>(string url)
 		{
 			var response = await GetAsync(url);
-			var result = await ReadAsJsonAsync<TResponse>(response);
-			if (result.error == null || result.errorCode == ignoreError)
+			var result = await ReadAsJsonAsync<AllDebridResponse<TResponse>>(response);
+			if (result.status == "success" || result.data != null)
 			{
-				return result;
+				return result.data;
 			}
-			throw new Exception($"{result.errorCode}: {result.error}");
+			throw new Exception($"{result.error.code}: {result.error.message}");
 		}
 	}
 }

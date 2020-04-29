@@ -1,8 +1,15 @@
 ﻿namespace Asdf.Clients.AllDebrid
 {
-	public class AllDebridResponse
+	public class AllDebridResponse<T>
 	{
-		public string error { get; set; }
-		public int errorCode { get; set; }
+		public string status { get; set; }
+		public AllDebridError error { get; set; }
+		public T data { get; set; }
+	}
+
+	public class AllDebridError
+	{
+		public string code { get; set; }
+		public string message { get; set; }
 	}
 }
