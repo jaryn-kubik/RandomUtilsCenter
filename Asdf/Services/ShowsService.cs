@@ -64,7 +64,7 @@ namespace Asdf.Services
 						Season = episodeInfo?.season_number ?? (int.TryParse(idSeason, out var seasonNumber) ? seasonNumber : 0),
 						Episode = episodeInfo?.episode_number ?? (int.TryParse(idEpisode, out var episodeNumber) ? episodeNumber : 0),
 
-						Date = episodeInfo == null ? default : DateTime.Parse(episodeInfo.air_date).AddDays(1),
+						Date = DateTime.TryParse(episodeInfo?.air_date, out var date) ? date.AddDays(1) : default,
 						IsWatchable = true
 					});
 				}
@@ -87,7 +87,7 @@ namespace Asdf.Services
 							Season = showInfo.next_episode_to_air.season_number,
 							Episode = showInfo.next_episode_to_air.episode_number,
 
-							Date = DateTime.Parse(showInfo.next_episode_to_air.air_date).AddDays(1)
+							Date = DateTime.TryParse(showInfo.next_episode_to_air.air_date, out var date) ? date.AddDays(1) : default
 						});
 					}
 				}
