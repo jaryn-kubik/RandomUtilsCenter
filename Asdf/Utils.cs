@@ -1,4 +1,6 @@
-﻿namespace Asdf
+﻿using System.Windows.Forms;
+
+namespace Asdf
 {
 	public static class Utils
 	{
@@ -19,6 +21,11 @@
 				}
 			}
 			return $"{value:F2} B";
+		}
+
+		public static void ShowMessage(string title, string msg)
+		{
+			MessageBox.Show(msg, title);
 		}
 	}
 }
