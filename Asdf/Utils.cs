@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Asdf
 {
@@ -25,7 +26,7 @@ namespace Asdf
 
 		public static void ShowMessage(string title, string msg)
 		{
-			MessageBox.Show(msg, title);
+			Task.Run(() => MessageBox.Show(msg, title));
 		}
 	}
 }
