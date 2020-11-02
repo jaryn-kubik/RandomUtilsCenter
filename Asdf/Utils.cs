@@ -26,7 +26,7 @@ namespace Asdf
 
 		public static void ShowMessage(string title, string msg)
 		{
-			Task.Run(() => MessageBox.Show(msg, title));
+			Task.Run(() => MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Exclamation));
 		}
 	}
 }
