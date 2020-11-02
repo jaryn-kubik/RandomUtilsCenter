@@ -1,0 +1,51 @@
+﻿@page "/watcher"
+@inject ConfigService _config
+
+<div class="d-flex w-100 justify-content-end align-items-center mb-1">
+	<button class="btn btn-primary" @onclick="OnAdd">Add</button>
+	<button class="btn btn-primary ml-2" @onclick="OnSave">Save</button>
+</div>
+
+<table class="table">
+	@foreach (var show in _config.HtmlWatcher)
+	{
+		<tr>
+			<td class="w-100">
+				<input type="text" class="w-100 form-control" @bind="show.Selector" />
+			</td>
+			<td class="py-0 align-middle">
+				@if (show.Enabled)
+				{
+					<button class="btn btn-success" @onclick="() => show.Enabled = false">Enabled</button>
+				}
+				else
+				{
+					<button class="btn btn-warning" @onclick="() => show.Enabled = true">Disabled</button>
+				}
+			</td>
+			<td class="py-0 align-middle">
+				<button class="btn btn-error" @onclick="() => OnRemove(show)">
+					<i class="fas fa-trash fa-fw fa-lg"></i>
+				</button>
+			</td>
+		</tr>
+	}
+</table>
+
+@code
+{
+	private void OnAdd()
+	{
+		_config.HtmlWatcher.Add(new ConfigService.HtmlWatcherConfig());
+	}
+
+	private void OnSave()
+	{
+		_config.Save();
+	}
+
+	private void OnRemove(ConfigService.HtmlWatcherConfig watcher)
+	{
+		_config.HtmlWatcher.Remove(watcher);
+	}
+}

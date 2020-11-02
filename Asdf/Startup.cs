@@ -1,4 +1,4 @@
-using Asdf.Clients.AllDebrid;
+﻿using Asdf.Clients.AllDebrid;
 using Asdf.Clients.JDownloader;
 using Asdf.Clients.Simkl;
 using Asdf.Clients.Tmdb;
@@ -43,6 +43,8 @@ namespace Asdf
 
 			services.AddScoped<DebridService>();
 			services.AddHttpClient<AllDebridClient>(x => x.BaseAddress = new Uri(AllDebridClient.ApiUrl));
+
+			services.AddHostedService<HtmlWatcherService>();
 		}
 
 		public void Configure(IApplicationBuilder app)

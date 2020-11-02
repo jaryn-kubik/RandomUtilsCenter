@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 
 namespace Asdf.Services
@@ -16,6 +17,8 @@ namespace Asdf.Services
 		public string JDownloaderDir { get; set; }
 		public string JDownloaderUserName { get; set; }
 		public string JDownloaderPassword { get; set; }
+
+		public List<HtmlWatcherConfig> HtmlWatcher { get; set; } = new List<HtmlWatcherConfig>();
 
 		public void Save()
 		{
@@ -39,6 +42,12 @@ namespace Asdf.Services
 				result.Save();
 				return result;
 			}
+		}
+
+		public class HtmlWatcherConfig
+		{
+			public bool Enabled { get; set; }
+			public string Selector { get; set; }
 		}
 	}
 }
