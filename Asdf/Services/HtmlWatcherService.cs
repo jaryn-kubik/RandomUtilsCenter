@@ -41,26 +41,35 @@ namespace Asdf.Services
 		{
 			foreach (var watcher in _config.HtmlWatcher.Where(x => x.Enabled))
 			{
-				try
-				{
-					var document = await _context.OpenAsync(watcher.Url);
-					var element = document.QuerySelector(watcher.Selector);
-					var text = element.Text();
-					var lines = text.Split('\n').Select(x => x?.Trim()).Where(x => !string.IsNullOrWhiteSpace(x));
-					var result = string.Join(Environment.NewLine, lines);
+				await GetAsync(watcher, false);
+			}
+		}
 
-					if (!_cache.TryGetValue(watcher, out var prev) || prev != result)
-					{
-						Utils.ShowMessage(watcher.Name, result);
-					}
-					_cache[watcher] = result;
-				}
-				catch (Exception ex)
+		public async Task GetAsync(ConfigService.HtmlWatcherConfig watcher, bool force)
+		{
+			try
+			{
+				if (force)
 				{
-					_logger.LogError(ex, $"HtmlWatcherService: {watcher.Url}");
-					Utils.ShowMessage("Error", ex.ToString());
-					throw;
+					_cache[watcher] = null;
 				}
+
+				var document = await _context.OpenAsync(watcher.Url);
+				var element = document.QuerySelector(watcher.Selector);
+				var text = element.Text();
+				var lines = text.Split('\n').Select(x => x?.Trim()).Where(x => !string.IsNullOrWhiteSpace(x));
+				var result = string.Join(Environment.NewLine, lines);
+
+				if (!_cache.TryGetValue(watcher, out var prev) || prev != result)
+				{
+					Utils.ShowMessage(watcher.Name, result);
+				}
+				_cache[watcher] = result;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"HtmlWatcherService: {watcher.Url}");
+				Utils.ShowMessage("Error", ex.ToString());
 			}
 		}
 	}

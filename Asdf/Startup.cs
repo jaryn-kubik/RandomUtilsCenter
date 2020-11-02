@@ -43,7 +43,8 @@ namespace Asdf
 			services.AddScoped<DebridService>();
 			services.AddHttpClient<AllDebridClient>(x => x.BaseAddress = new Uri(AllDebridClient.ApiUrl));
 
-			services.AddHostedService<HtmlWatcherService>();
+			services.AddSingleton<HtmlWatcherService>();
+			services.AddHostedService(x => x.GetRequiredService<HtmlWatcherService>());
 		}
 
 		public void Configure(IApplicationBuilder app)
