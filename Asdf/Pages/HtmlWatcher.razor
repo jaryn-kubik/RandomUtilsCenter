@@ -7,10 +7,19 @@
 </div>
 
 <table class="table">
+	<tr>
+		<th>Url</th>
+		<th>Selector</th>
+		<th></th>
+		<th></th>
+	</tr>
 	@foreach (var show in _config.HtmlWatcher)
 	{
 		<tr>
-			<td class="w-100">
+			<td class="w-25">
+				<input type="text" class="w-100 form-control" @bind="show.Url" />
+			</td>
+			<td class="w-75">
 				<input type="text" class="w-100 form-control" @bind="show.Selector" />
 			</td>
 			<td class="py-0 align-middle">

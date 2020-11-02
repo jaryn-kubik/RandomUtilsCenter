@@ -47,6 +47,7 @@ namespace Asdf.Services
 		public class HtmlWatcherConfig
 		{
 			public bool Enabled { get; set; }
+			public string Url { get; set; }
 			public string Selector { get; set; }
 		}
 	}

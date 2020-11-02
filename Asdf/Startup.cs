@@ -17,7 +17,6 @@ namespace Asdf
 		public static void Main(string[] args)
 		{
 			Host.CreateDefaultBuilder(args)
-				.UseWindowsService()
 				.ConfigureLogging(x => x.AddProvider(new LoggerProvider()))
 				.ConfigureWebHostDefaults(x => x.UseStartup<Startup>())
 				.Build()

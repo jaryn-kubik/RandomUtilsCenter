@@ -3,10 +3,15 @@
     <TargetFramework>net5</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <OutputType>WinExe</OutputType>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.14.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.0-rc.2.20478.4" />
   </ItemGroup>
+
   <ItemGroup>
     <Content Update="libman.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
