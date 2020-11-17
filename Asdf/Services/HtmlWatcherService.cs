@@ -27,7 +27,7 @@ namespace Asdf.Services
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
 			_context = BrowsingContext.New(Configuration.Default.WithDefaultLoader());
-			_timer = new Timer(OnTimer, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
+			_timer = new Timer(OnTimer, null, TimeSpan.Zero, TimeSpan.FromMinutes(_config.HtmlWatcherInterval));
 			return Task.CompletedTask;
 		}
 
@@ -35,6 +35,12 @@ namespace Asdf.Services
 		{
 			try { await _timer.DisposeAsync(); }
 			catch { }
+		}
+
+		public void OnIntervalChanged()
+		{
+			var timeSpan = TimeSpan.FromMinutes(_config.HtmlWatcherInterval);
+			_timer.Change(timeSpan, timeSpan);
 		}
 
 		private async void OnTimer(object state)

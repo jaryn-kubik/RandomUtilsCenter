@@ -19,6 +19,7 @@ namespace Asdf.Services
 		public string JDownloaderPassword { get; set; }
 
 		public List<HtmlWatcherConfig> HtmlWatcher { get; set; } = new List<HtmlWatcherConfig>();
+		public double HtmlWatcherInterval { get; set; } = 5;
 
 		public void Save()
 		{
