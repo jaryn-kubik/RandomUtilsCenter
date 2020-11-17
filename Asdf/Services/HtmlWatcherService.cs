@@ -4,7 +4,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,6 +14,7 @@ namespace Asdf.Services
 {
 	public class HtmlWatcherService : IHostedService
 	{
+		private readonly string _path;
 		private readonly Dictionary<ConfigService.HtmlWatcherConfig, string> _cache = new();
 		private readonly ILogger<HtmlWatcherService> _logger;
 		private readonly ConfigService _config;
@@ -20,12 +23,28 @@ namespace Asdf.Services
 
 		public HtmlWatcherService(ILogger<HtmlWatcherService> logger, ConfigService config)
 		{
+			_path = Path.Combine(Path.GetDirectoryName(typeof(Startup).Assembly.Location), ".watcher.json");
 			_logger = logger;
 			_config = config;
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
+			try
+			{
+				var json = File.ReadAllBytes(_path);
+				var data = JsonSerializer.Deserialize<IEnumerable<WatcherCache>>(json);
+				foreach (var item in data)
+				{
+					var watcher = _config.HtmlWatcher.FirstOrDefault(x => x.Url == item.Url);
+					if (watcher != null)
+					{
+						_cache[watcher] = item.Value;
+					}
+				}
+			}
+			catch { }
+
 			_context = BrowsingContext.New(Configuration.Default.WithDefaultLoader());
 			_timer = new Timer(OnTimer, null, TimeSpan.Zero, TimeSpan.FromMinutes(_config.HtmlWatcherInterval));
 			return Task.CompletedTask;
@@ -49,6 +68,10 @@ namespace Asdf.Services
 			{
 				await GetAsync(watcher, false);
 			}
+
+			var data = _cache.Select(x => new WatcherCache(x.Key.Url, x.Value));
+			var json = JsonSerializer.SerializeToUtf8Bytes(data, new JsonSerializerOptions { WriteIndented = true });
+			File.WriteAllBytes(_path, json);
 		}
 
 		public async Task GetAsync(ConfigService.HtmlWatcherConfig watcher, bool force)
@@ -78,5 +101,7 @@ namespace Asdf.Services
 				Utils.ShowMessage("Error", ex.ToString());
 			}
 		}
+
+		private record WatcherCache(string Url, string Value);
 	}
 }
