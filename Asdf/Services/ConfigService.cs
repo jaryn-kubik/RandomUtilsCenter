@@ -22,7 +22,7 @@ namespace Asdf.Services
 		public double HtmlWatcherInterval { get; set; } = 5;
 
 		public int PingInterval { get; set; } = 1;
-		public int PingLatency { get; set; } = 50;
+		public int PingLatency { get; set; } = 20;
 
 		public void Save()
 		{

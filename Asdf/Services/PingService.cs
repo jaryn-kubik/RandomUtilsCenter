@@ -22,7 +22,6 @@ namespace Asdf.Services
 		private readonly ILogger<PingService> _logger;
 		private readonly ConfigService _config;
 		private BinaryWriter _writer;
-		private DateTime _nextFlush = DateTime.Now.AddMinutes(1);
 
 		public PingService(ILogger<PingService> logger, ConfigService config)
 		{
@@ -88,16 +87,14 @@ namespace Asdf.Services
 		{
 			var timestamp = DateTime.Now;
 			var reply = await _ping.SendPingAsync(_ip, 2000);
-			_items.TryAdd(timestamp, new PingEntry(reply.Status, reply.RoundtripTime));
-			_writer.Write(timestamp.ToBinary());
-			_writer.Write((int)reply.Status);
-			_writer.Write(reply.RoundtripTime);
-			Updated?.Invoke();
-
-			if (_nextFlush < timestamp)
+			if (reply.Status != IPStatus.Success || reply.RoundtripTime > _config.PingLatency)
 			{
+				_items.TryAdd(timestamp, new PingEntry(reply.Status, reply.RoundtripTime));
+				_writer.Write(timestamp.ToBinary());
+				_writer.Write((int)reply.Status);
+				_writer.Write(reply.RoundtripTime);
 				_writer.Flush();
-				_nextFlush = DateTime.Now.AddMinutes(1);
+				Updated?.Invoke();
 			}
 		}
 

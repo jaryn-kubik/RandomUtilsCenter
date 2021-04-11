@@ -27,9 +27,9 @@
 		var css = "text-success";
 		if (entry.Value.Status != System.Net.NetworkInformation.IPStatus.Success)
 		{
-			css = "text-error";
+			css = "text-danger";
 		}
-		else if (entry.Value.RoundtripTime > _config.PingLatency)
+		else if (entry.Value.RoundtripTime > 50)
 		{
 			css = "text-warning";
 		}
@@ -43,7 +43,7 @@
 
 @code
 {
-	private bool _showAll = false;
+	private bool _showAll = true;
 
 	protected override void OnInitialized()
 	{
@@ -66,6 +66,6 @@
 	}
 
 	private IEnumerable<KeyValuePair<DateTime, PingService.PingEntry>> Items => _service.Entries
-		.Where(x => _showAll || x.Value.Status != System.Net.NetworkInformation.IPStatus.Success || x.Value.RoundtripTime > _config.PingLatency)
+		.Where(x => _showAll || x.Value.Status != System.Net.NetworkInformation.IPStatus.Success)
 		.OrderByDescending(x => x.Key);
 }
