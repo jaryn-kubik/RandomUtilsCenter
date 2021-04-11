@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -31,6 +32,7 @@ namespace Asdf.Services
 
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
+			var shouldRewrite = false;
 			var stream = File.Open(_path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 			using var reader = new BinaryReader(stream, Encoding.ASCII, true);
 			while (reader.PeekChar() != -1)
@@ -40,7 +42,34 @@ namespace Asdf.Services
 					var timestamp = DateTime.FromBinary(reader.ReadInt64());
 					var status = (IPStatus)reader.ReadInt32();
 					var roundtripTime = reader.ReadInt64();
-					_items.TryAdd(timestamp, new PingEntry(status, roundtripTime));
+					if (status != IPStatus.Success || roundtripTime > _config.PingLatency)
+					{
+						_items.TryAdd(timestamp, new PingEntry(status, roundtripTime));
+					}
+					else
+					{
+						shouldRewrite = true;
+					}
+				}
+				catch { }
+			}
+			if (shouldRewrite)
+			{
+				try
+				{
+					using var ms = new MemoryStream();
+					using (var msWriter = new BinaryWriter(ms, Encoding.ASCII, true))
+					{
+						foreach (var item in _items.OrderBy(x => x.Key))
+						{
+							msWriter.Write(item.Key.ToBinary());
+							msWriter.Write((int)item.Value.Status);
+							msWriter.Write(item.Value.RoundtripTime);
+						}
+					}
+					stream.SetLength(0);
+					stream.Write(ms.ToArray());
+					stream.Flush();
 				}
 				catch { }
 			}
