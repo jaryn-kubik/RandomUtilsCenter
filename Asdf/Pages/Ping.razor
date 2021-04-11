@@ -1,0 +1,71 @@
+﻿@page "/ping"
+@implements IDisposable
+@inject ConfigService _config
+@inject PingService _service
+
+<div class="d-flex w-100 justify-content-end align-items-center mb-1">
+	<div class="ml-5">
+		Show all: <input type="checkbox" @bind="_showAll" />
+	</div>
+	<div class="ml-5">
+		Latency: <input type="number" min="0" max="200" @bind="_config.PingLatency" />
+	</div>
+	<div class="ml-2">
+		Interval: <input type="number" min="0" max="60" @bind="_config.PingInterval" />
+		<button class="btn btn-primary ml-2" @onclick="OnSave">Save</button>
+	</div>
+</div>
+
+<table class="table table-sm">
+	<tr>
+		<th>Timestamp</th>
+		<th>Status</th>
+		<th>Latency</th>
+	</tr>
+	@foreach (var entry in Items)
+	{
+		var css = "text-success";
+		if (entry.Value.Status != System.Net.NetworkInformation.IPStatus.Success)
+		{
+			css = "text-error";
+		}
+		else if (entry.Value.RoundtripTime > _config.PingLatency)
+		{
+			css = "text-warning";
+		}
+		<tr class="@css">
+			<td>@entry.Key.ToString("yyyy-MM-dd HH:mm:ss")</td>
+			<td>@entry.Value.Status</td>
+			<td>@entry.Value.RoundtripTime</td>
+		</tr>
+	}
+</table>
+
+@code
+{
+	private bool _showAll = false;
+
+	protected override void OnInitialized()
+	{
+		_service.Updated += OnUpdated;
+	}
+
+	public void Dispose()
+	{
+		_service.Updated -= OnUpdated;
+	}
+
+	private void OnSave()
+	{
+		_config.Save();
+	}
+
+	private void OnUpdated()
+	{
+		_ = InvokeAsync(StateHasChanged);
+	}
+
+	private IEnumerable<KeyValuePair<DateTime, PingService.PingEntry>> Items => _service.Entries
+		.Where(x => _showAll || x.Value.Status != System.Net.NetworkInformation.IPStatus.Success || x.Value.RoundtripTime > _config.PingLatency)
+		.OrderByDescending(x => x.Key);
+}

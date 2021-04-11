@@ -21,6 +21,9 @@ namespace Asdf.Services
 		public List<HtmlWatcherConfig> HtmlWatcher { get; set; } = new List<HtmlWatcherConfig>();
 		public double HtmlWatcherInterval { get; set; } = 5;
 
+		public int PingInterval { get; set; } = 1;
+		public int PingLatency { get; set; } = 50;
+
 		public void Save()
 		{
 			var data = JsonSerializer.SerializeToUtf8Bytes(this, new JsonSerializerOptions { WriteIndented = true });

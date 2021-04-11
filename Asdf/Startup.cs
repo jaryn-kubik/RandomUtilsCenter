@@ -55,6 +55,9 @@ namespace Asdf
 
 			services.AddSingleton<HtmlWatcherService>();
 			services.AddHostedService(x => x.GetRequiredService<HtmlWatcherService>());
+
+			services.AddSingleton<PingService>();
+			services.AddHostedService(x => x.GetRequiredService<PingService>());
 		}
 
 		public void Configure(IApplicationBuilder app)
