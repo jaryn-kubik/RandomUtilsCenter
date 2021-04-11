@@ -98,7 +98,7 @@ namespace Asdf.Services
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"HtmlWatcherService: {watcher.Url}");
-				Utils.ShowMessage("Error", ex.ToString());
+				Utils.ShowMessage("Error", $"Url: {watcher.Url}{Environment.NewLine}Exception: {ex}");
 			}
 		}
 
