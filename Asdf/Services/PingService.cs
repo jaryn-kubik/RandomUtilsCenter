@@ -22,6 +22,7 @@ namespace Asdf.Services
 		private readonly ILogger<PingService> _logger;
 		private readonly ConfigService _config;
 		private BinaryWriter _writer;
+		private DateTime _nextFlush = DateTime.Now.AddMinutes(1);
 
 		public PingService(ILogger<PingService> logger, ConfigService config)
 		{
@@ -92,6 +93,12 @@ namespace Asdf.Services
 			_writer.Write((int)reply.Status);
 			_writer.Write(reply.RoundtripTime);
 			Updated?.Invoke();
+
+			if (_nextFlush < timestamp)
+			{
+				_writer.Flush();
+				_nextFlush = DateTime.Now.AddMinutes(1);
+			}
 		}
 
 		public event Action Updated;
