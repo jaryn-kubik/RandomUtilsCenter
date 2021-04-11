@@ -17,8 +17,18 @@ namespace Asdf
 		public static void Main(string[] args)
 		{
 			Host.CreateDefaultBuilder(args)
-				.ConfigureLogging(x => x.AddProvider(new LoggerProvider()))
-				.ConfigureWebHostDefaults(x => x.UseStartup<Startup>())
+				.ConfigureLogging(x =>
+				{
+					x.AddProvider(new LoggerProvider());
+					x.SetMinimumLevel(LogLevel.Debug);
+					x.AddFilter("System", LogLevel.Information);
+					x.AddFilter("Microsoft", LogLevel.Information);
+				})
+				.ConfigureWebHostDefaults(x =>
+				{
+					x.UseStartup<Startup>();
+					x.ConfigureKestrel(y => y.ListenLocalhost(1337, z => z.UseHttps()));
+				})
 				.Build()
 				.Run();
 		}

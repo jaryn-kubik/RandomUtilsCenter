@@ -3,14 +3,14 @@
 	"defaultProvider": "cdnjs",
 	"libraries": [
 		{
-			"library": "bootswatch@4.5.3",
+			"library": "bootswatch@4.6.0",
 			"destination": "wwwroot/css",
 			"files": [
 				"darkly/bootstrap.min.css"
 			]
 		},
 		{
-			"library": "font-awesome@5.15.1",
+			"library": "font-awesome@5.15.3",
 			"destination": "wwwroot/",
 			"files": [
 				"js/all.js"
