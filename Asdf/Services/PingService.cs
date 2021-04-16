@@ -115,7 +115,7 @@ namespace Asdf.Services
 		private async Task SendPingAsync()
 		{
 			var timestamp = DateTime.Now;
-			var reply = await _ping.SendPingAsync(_ip, 2000);
+			var reply = await _ping.SendPingAsync(_ip, 10000);
 			if (reply.Status != IPStatus.Success || reply.RoundtripTime > _config.PingLatency)
 			{
 				_items.TryAdd(timestamp, new PingEntry(reply.Status, reply.RoundtripTime));

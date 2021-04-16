@@ -29,7 +29,7 @@
 		{
 			css = "text-danger";
 		}
-		else if (entry.Value.RoundtripTime > 50)
+		else if (entry.Value.RoundtripTime >= 100)
 		{
 			css = "text-warning";
 		}
@@ -66,6 +66,6 @@
 	}
 
 	private IEnumerable<KeyValuePair<DateTime, PingService.PingEntry>> Items => _service.Entries
-		.Where(x => _showAll || x.Value.Status != System.Net.NetworkInformation.IPStatus.Success)
+		.Where(x => _showAll || x.Value.Status != System.Net.NetworkInformation.IPStatus.Success || x.Value.RoundtripTime >= 100)
 		.OrderByDescending(x => x.Key);
 }
