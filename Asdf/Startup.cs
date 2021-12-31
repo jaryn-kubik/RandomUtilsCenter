@@ -65,6 +65,9 @@ namespace Asdf
 
 			services.AddSingleton<PingService>();
 			services.AddHostedService(x => x.GetRequiredService<PingService>());
+
+			services.AddSingleton<ClipboardService>();
+			services.AddHostedService(x => x.GetRequiredService<ClipboardService>());
 		}
 	}
 }

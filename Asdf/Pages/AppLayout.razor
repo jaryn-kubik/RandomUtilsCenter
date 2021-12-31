@@ -26,11 +26,10 @@
 
 	private IEnumerable<KeyValuePair<string, string>> GetLinks()
 	{
+		yield return new("torrents", "Torrents");
 		//yield return new("shows", "Shows");
-		//yield return new("torrents", "Torrents");
 		//yield return new("debrid", "Debrid");
 		//yield return new("downloads", "Downloads");
-		//yield return new("subtitles", "Subtitles");
 		yield return new("watcher", "Watcher");
 		yield return new("ping", "Ping");
 	}

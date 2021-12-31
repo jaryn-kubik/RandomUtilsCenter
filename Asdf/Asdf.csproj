@@ -9,8 +9,4 @@
 		<PackageReference Include="AngleSharp" Version="0.16.1" />
 		<PackageReference Include="MudBlazor" Version="6.0.3" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="wwwroot\css\" />
-	</ItemGroup>
 </Project>
