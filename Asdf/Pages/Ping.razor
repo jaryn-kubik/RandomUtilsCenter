@@ -3,43 +3,26 @@
 @inject ConfigService _config
 @inject PingService _service
 
-<div class="d-flex w-100 justify-content-end align-items-center mb-1">
-	<div class="ml-5">
-		Show all: <input type="checkbox" @bind="_showAll" />
-	</div>
-	<div class="ml-5">
-		Latency: <input type="number" min="0" max="200" @bind="_config.PingLatency" />
-	</div>
-	<div class="ml-2">
-		Interval: <input type="number" min="0" max="60" @bind="_config.PingInterval" />
-		<button class="btn btn-primary ml-2" @onclick="OnSave">Save</button>
-	</div>
-</div>
+<MudToolBar Class="gap-1">
+	<MudSpacer />
+	<MudNumericField @bind-Value="_config.PingLatency" Label="Latency" Min="0" Max="200" Margin="Margin.Dense" Class="flex-grow-0" />
+	<MudNumericField @bind-Value="_config.PingInterval" Label="Interval" Min="0" Max="60" Margin="Margin.Dense" Class="flex-grow-0 mr-5" />
+	<MudCheckBox @bind-Checked="_showAll" Label="Show all" />
+	<MudButton OnClick="OnSave" Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
+</MudToolBar>
 
-<table class="table table-sm">
-	<tr>
-		<th>Timestamp</th>
-		<th>Status</th>
-		<th>Latency</th>
-	</tr>
-	@foreach (var entry in Items)
-	{
-		var css = "text-success";
-		if (entry.Value.Status != System.Net.NetworkInformation.IPStatus.Success)
-		{
-			css = "text-danger";
-		}
-		else if (entry.Value.RoundtripTime >= 100)
-		{
-			css = "text-warning";
-		}
-		<tr class="@css">
-			<td>@entry.Key.ToString("yyyy-MM-dd HH:mm:ss")</td>
-			<td>@entry.Value.Status</td>
-			<td>@entry.Value.RoundtripTime</td>
-		</tr>
-	}
-</table>
+<MudTable Items="Items" ReadOnly="true" Dense="true" RowClassFunc="GetRowClass" HeaderClass="mud-theme-primary">
+	<HeaderContent>
+		<MudTh>Timestamp</MudTh>
+		<MudTh>Status</MudTh>
+		<MudTh>Latency</MudTh>
+	</HeaderContent>
+	<RowTemplate>
+		<MudTd>@context.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
+		<MudTd>@context.Status</MudTd>
+		<MudTd>@context.RoundtripTime</MudTd>
+	</RowTemplate>
+</MudTable>
 
 @code
 {
@@ -65,7 +48,18 @@
 		_ = InvokeAsync(StateHasChanged);
 	}
 
-	private IEnumerable<KeyValuePair<DateTime, PingService.PingEntry>> Items => _service.Entries
-		.Where(x => _showAll || x.Value.Status != System.Net.NetworkInformation.IPStatus.Success || x.Value.RoundtripTime >= 100)
-		.OrderByDescending(x => x.Key);
+	private IEnumerable<PingItem> Items => _service.Items.Where(x => _showAll || x.Status != System.Net.NetworkInformation.IPStatus.Success || x.RoundtripTime >= 100);
+
+	private string GetRowClass(PingItem item, int index)
+	{
+		if (item.Status != System.Net.NetworkInformation.IPStatus.Success)
+		{
+			return "mud-theme-error";
+		}
+		if (item.RoundtripTime >= 100)
+		{
+			return "mud-theme-warning";
+		}
+		return "mud-theme-success";
+	}
 }

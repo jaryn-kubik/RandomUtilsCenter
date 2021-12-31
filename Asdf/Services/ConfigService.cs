@@ -14,10 +14,6 @@ namespace Asdf.Services
 		public string SimklToken { get; set; }
 		public string TmdbApiKey { get; set; }
 
-		public string JDownloaderDir { get; set; }
-		public string JDownloaderUserName { get; set; }
-		public string JDownloaderPassword { get; set; }
-
 		public List<HtmlWatcherConfig> HtmlWatcher { get; set; } = new List<HtmlWatcherConfig>();
 		public double HtmlWatcherInterval { get; set; } = 5;
 

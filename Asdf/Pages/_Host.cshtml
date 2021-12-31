@@ -9,12 +9,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>@nameof(Asdf)</title>
 	<base href="~/" />
-	<link rel="stylesheet" href="css/darkly/bootstrap.min.css" />
-	<link rel="stylesheet" href="css/site.css" />
-	<script src="js/all.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+	<link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="site.css" />
+	<script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </head>
 <body>
-	@(await Html.RenderComponentAsync<App>(RenderMode.Server))
+	<component type="typeof(App)" render-mode="Server" />
 	<script src="_framework/blazor.server.js"></script>
 </body>
 </html>

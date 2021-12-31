@@ -19,7 +19,7 @@ namespace Asdf.Services
 		private readonly string _path = Path.Combine(Path.GetDirectoryName(typeof(Startup).Assembly.Location), ".ping.bin");
 		private readonly Ping _ping = new();
 		private readonly CancellationTokenSource _cancellationTokenSource = new();
-		private readonly ConcurrentDictionary<DateTime, PingEntry> _items = new();
+		private readonly ConcurrentDictionary<DateTime, PingDto> _items = new();
 		private readonly ILogger<PingService> _logger;
 		private readonly ConfigService _config;
 		private BinaryWriter _writer;
@@ -44,7 +44,7 @@ namespace Asdf.Services
 					var roundtripTime = reader.ReadInt64();
 					if (status != IPStatus.Success || roundtripTime > _config.PingLatency)
 					{
-						_items.TryAdd(timestamp, new PingEntry(status, roundtripTime));
+						_items.TryAdd(timestamp, new PingDto(status, roundtripTime));
 					}
 					else
 					{
@@ -118,7 +118,7 @@ namespace Asdf.Services
 			var reply = await _ping.SendPingAsync(_ip, 10000);
 			if (reply.Status != IPStatus.Success || reply.RoundtripTime > _config.PingLatency)
 			{
-				_items.TryAdd(timestamp, new PingEntry(reply.Status, reply.RoundtripTime));
+				_items.TryAdd(timestamp, new PingDto(reply.Status, reply.RoundtripTime));
 				_writer.Write(timestamp.ToBinary());
 				_writer.Write((int)reply.Status);
 				_writer.Write(reply.RoundtripTime);
@@ -128,8 +128,15 @@ namespace Asdf.Services
 		}
 
 		public event Action Updated;
-		public IEnumerable<KeyValuePair<DateTime, PingEntry>> Entries => _items;
+		public IEnumerable<PingItem> Items => _items
+			.Select(x => new PingItem
+			{
+				Timestamp = x.Key,
+				Status = x.Value.Status,
+				RoundtripTime = x.Value.RoundtripTime
+			})
+			.OrderByDescending(x => x.Timestamp);
 
-		public record PingEntry(IPStatus Status, long RoundtripTime);
+		private record PingDto(IPStatus Status, long RoundtripTime);
 	}
 }

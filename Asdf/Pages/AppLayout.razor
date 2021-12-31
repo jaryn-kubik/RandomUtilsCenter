@@ -1,32 +1,37 @@
 ﻿@inherits LayoutComponentBase
 
-<nav class="navbar navbar-expand navbar-dark bg-primary sticky-top py-0">
-	<ul class="navbar-nav mr-auto">
-		<li class="nav-item">
-			<NavLink class="nav-link p-4" href="shows">Shows</NavLink>
-		</li>
-		<li class="nav-item">
-			<NavLink class="nav-link p-4" href="torrents">Torrents</NavLink>
-		</li>
-		<li class="nav-item">
-			<NavLink class="nav-link p-4" href="debrid">Debrid</NavLink>
-		</li>
-		@*
-			<li class="nav-item">
-				<NavLink class="nav-link p-4" href="downloads">Downloads</NavLink>
-			</li>
-			<li class="nav-item">
-				<NavLink class="nav-link p-4" href="subtitles">Subtitles</NavLink>
-			</li>
-		*@
-		<li class="nav-item">
-			<NavLink class="nav-link p-4" href="watcher">Watcher</NavLink>
-		</li>
-		<li class="nav-item">
-			<NavLink class="nav-link p-4" href="ping">Ping</NavLink>
-		</li>
-	</ul>
-</nav>
-<main class="px-5 py-3">
-	@Body
-</main>
+<MudThemeProvider Theme="_theme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+	<MudAppBar Dense="true">
+		@foreach (var link in GetLinks())
+		{
+			<NavLink href="@link.Key" class="mx-1 flex-grow-1 text-center">
+				<MudPaper Class="py-2">@link.Value</MudPaper>
+			</NavLink>
+		}
+	</MudAppBar>
+	<MudMainContent>
+		<MudContainer MaxWidth="MaxWidth.False" Class="d-flex flex-column py-3 gap-1">
+			@Body
+		</MudContainer>
+	</MudMainContent>
+</MudLayout>
+
+@code
+{
+	private MudTheme _theme = new MudTheme { IsDarkMode = true };
+
+	private IEnumerable<KeyValuePair<string, string>> GetLinks()
+	{
+		//yield return new("shows", "Shows");
+		//yield return new("torrents", "Torrents");
+		//yield return new("debrid", "Debrid");
+		//yield return new("downloads", "Downloads");
+		//yield return new("subtitles", "Subtitles");
+		yield return new("watcher", "Watcher");
+		yield return new("ping", "Ping");
+	}
+}

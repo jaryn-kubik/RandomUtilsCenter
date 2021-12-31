@@ -1,0 +1,12 @@
+.text-center {
+	text-align: center;
+}
+
+.active > .mud-paper {
+	color: var(--mud-palette-primary-text) !important;
+	background-color: var(--mud-palette-primary) !important;
+}
+
+.gap-1 {
+	gap: 1em;
+}
