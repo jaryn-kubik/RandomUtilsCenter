@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Asdf.Services
@@ -10,6 +11,7 @@ namespace Asdf.Services
 	{
 		private readonly RdNetClient _client;
 		private readonly TimerSync _sync;
+		private readonly SemaphoreSlim _clientSync = new(1, 1);
 
 		public DebridService()
 		{
@@ -24,6 +26,11 @@ namespace Asdf.Services
 		public IEnumerable<Torrent> GetTorrents(string hash)
 		{
 			return Items.Where(x => string.Equals(x.Hash, hash, StringComparison.OrdinalIgnoreCase));
+		}
+
+		public Torrent GetTorrent(string hash)
+		{
+			return GetTorrents(hash).FirstOrDefault();
 		}
 
 		public async Task ReloadAsync()
@@ -53,8 +60,12 @@ namespace Asdf.Services
 				if (torrent.Status == "waiting_files_selection")
 				{
 					var files = torrent.Files.Where(x =>
+						x.Bytes > 1024 &&
 						!x.Path.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) &&
-						!x.Path.EndsWith(".nfo", StringComparison.OrdinalIgnoreCase)
+						!x.Path.EndsWith(".nfo", StringComparison.OrdinalIgnoreCase) &&
+						!x.Path.EndsWith(".srt", StringComparison.OrdinalIgnoreCase) &&
+						!x.Path.EndsWith(".sub", StringComparison.OrdinalIgnoreCase) &&
+						!x.Path.EndsWith(".ass", StringComparison.OrdinalIgnoreCase)
 					);
 					await _client.Torrents.SelectFilesAsync(result.Id, files.Select(x => x.Id.ToString()).ToArray());
 				}
@@ -64,15 +75,18 @@ namespace Asdf.Services
 
 		public async Task DeleteAsync(string hash)
 		{
-			var torrents = GetTorrents(hash).ToArray();
-			foreach (var torrent in torrents)
+			foreach (var torrent in GetTorrents(hash).ToArray())
 			{
 				await _client.Torrents.DeleteAsync(torrent.Id);
 			}
-			if (torrents.Length > 0)
-			{
-				await ReloadAsync();
-			}
+			await ReloadAsync();
+		}
+
+		public async Task<UnrestrictLink> UnrestrictAsync(string link)
+		{
+			await _clientSync.WaitAsync();
+			try { return await _client.Unrestrict.LinkAsync(link); }
+			finally { _clientSync.Release(); }
 		}
 	}
 }

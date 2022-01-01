@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,24 +9,32 @@ namespace Asdf.Services
 {
 	public class TorrentsService
 	{
-		private readonly JsonHelper<List<TorrentItem>> _list;
+		private readonly JsonHelper<ConcurrentDictionary<string, TorrentItem>> _items;
 		private readonly DebridService _debrid;
 
 		public TorrentsService(ClipboardService clipboard, DebridService debrid)
 		{
-			_list = JsonHelper<List<TorrentItem>>.Load("torrents");
+			_items = JsonHelper<ConcurrentDictionary<string, TorrentItem>>.Load("torrents", x => new ConcurrentDictionary<string, TorrentItem>(x, StringComparer.OrdinalIgnoreCase));
 			clipboard.Changed += Clipboard_ChangedAsync;
 			_debrid = debrid;
 		}
 
-		public IReadOnlyList<TorrentItem> Items => _list.Instance;
+		public IReadOnlyDictionary<string, TorrentItem> Items => _items.Instance;
 		public event Action Changed;
 
-		public async Task DeleteAsync(TorrentItem item)
+		public async Task DeleteAllAsync()
 		{
-			await _debrid.DeleteAsync(item.Hash);
-			_list.Instance.Remove(item);
-			_list.Save();
+			foreach (var item in Items.Keys.ToArray())
+			{
+				await DeleteAsync(item);
+			}
+		}
+
+		public async Task DeleteAsync(string hash)
+		{
+			_items.Instance.TryRemove(hash, out _);
+			await _debrid.DeleteAsync(hash);
+			_items.Save();
 		}
 
 		private async void Clipboard_ChangedAsync(string text)
@@ -49,21 +58,10 @@ namespace Asdf.Services
 			hash = hash?.Trim();
 			magnet = magnet?.Trim();
 
-			var item = _list.Instance.FirstOrDefault(x =>
-				(!string.IsNullOrWhiteSpace(x.Name) && x.Name == name) ||
-				(!string.IsNullOrWhiteSpace(x.Hash) && x.Hash == hash) ||
-				(!string.IsNullOrWhiteSpace(x.Magnet) && x.Magnet == magnet)
-			);
-			if (item == null)
-			{
-				item = new TorrentItem();
-				_list.Instance.Add(item);
-			}
-
+			var item = _items.Instance.GetOrAdd(hash, new TorrentItem { Hash = hash });
 			item.Name = name ?? item.Name;
-			item.Hash = hash ?? item.Hash;
 			item.Magnet = magnet ?? item.Magnet;
-			_list.Save();
+			_items.Save();
 			return item;
 		}
 	}

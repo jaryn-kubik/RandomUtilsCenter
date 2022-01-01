@@ -20,10 +20,11 @@ namespace Asdf
 		public void Start()
 		{
 			Stop();
+			var timer = new PeriodicTimer(_interval);
+			_timer = timer;
 			Task.Run(async void () =>
 			{
-				_timer = new PeriodicTimer(_interval);
-				while (await _timer.WaitForNextTickAsync())
+				while (await timer.WaitForNextTickAsync())
 				{
 					try
 					{

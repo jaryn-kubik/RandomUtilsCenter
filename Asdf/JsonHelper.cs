@@ -6,16 +6,16 @@ namespace Asdf
 {
 	public sealed class JsonHelper<T> where T : new()
 	{
-		public JsonHelper(string path, T instance)
+		private JsonHelper(string path, T instance, Func<T, T> transform = null)
 		{
 			FilePath = path;
-			Instance = instance;
+			Instance = transform != null ? transform(instance) : instance;
 		}
 
 		public string FilePath { get; }
 		public T Instance { get; }
 
-		public static JsonHelper<T> Load(string fileName)
+		public static JsonHelper<T> Load(string fileName, Func<T, T> transform = null)
 		{
 			var dir = Path.GetDirectoryName(typeof(Startup).Assembly.Location);
 			var path = Path.Combine(dir, $".{fileName}.json");
@@ -23,12 +23,12 @@ namespace Asdf
 			{
 				var data = File.ReadAllBytes(path);
 				var instance = JsonSerializer.Deserialize<T>(data);
-				return new JsonHelper<T>(path, instance);
+				return new JsonHelper<T>(path, instance, transform);
 			}
 			catch
 			{
 				var instance = new T();
-				var result = new JsonHelper<T>(path, instance);
+				var result = new JsonHelper<T>(path, instance, transform);
 				result.Save();
 				return result;
 			}

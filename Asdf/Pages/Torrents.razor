@@ -4,43 +4,81 @@
 @inject TorrentsService _torrents
 @inject DebridService _debrid
 @inject ClipboardService _clipboard
+@inject DownloadsService _downloads
 
 <MudToolBar Class="gap-1">
 	<MudSpacer />
-	<MudButton OnClick="OnCopyAll" Variant="Variant.Filled" Color="Color.Primary">Copy All</MudButton>
+	<MudButton OnClick="Copy" Variant="Variant.Filled" Color="Color.Primary">Copy All</MudButton>
+	<MudButton OnClick="_downloads.Update" Variant="Variant.Filled" Color="Color.Primary">Download All</MudButton>
+	<MudButton OnClick="_torrents.DeleteAllAsync" Variant="Variant.Filled" Color="Color.Warning">Delete All</MudButton>
+	<MudButton OnClick="_downloads.Clear" Variant="Variant.Filled" Color="Color.Warning">Clear</MudButton>
+	<MudButton OnClick="_downloads.Stop" Variant="Variant.Filled" Color="Color.Error">Stop</MudButton>
 </MudToolBar>
 
 <MudTable Items="GetItems()" ReadOnly="true" Dense="true" HeaderClass="mud-theme-primary">
 	<HeaderContent>
 		<MudTh>Name</MudTh>
 		<MudTh>Status</MudTh>
-		<MudTh>Progress</MudTh>
 		<MudTh>Size</MudTh>
 		<MudTh></MudTh>
 	</HeaderContent>
 	<RowTemplate>
 		@{
-			var torrent = GetTorrent(context);
+			var torrent = _debrid.GetTorrent(context.Hash);
 		}
 		<MudTd>
 			<div>@context.Name</div>
 			@if (torrent?.Links?.Count > 0)
 			{
-				<div class="mt-2">
+				<div class="mt-2" style="display: grid; grid-template-columns: 1fr 3em 3em 10em 15em; column-gap: 2em">
 					@foreach (var link in torrent.Links)
 					{
-						<a class="d-block" href="@("https://real-debrid.com/downloader?links=" + link)">@link</a>
+						var download = _downloads.GetDownload(link);
+						<a href="@("https://real-debrid.com/downloader?links=" + link)">@(download?.FileName ?? link)</a>
+						<div>
+							@if (download != null)
+							{
+								<span>@download.Done</span>
+
+							}
+						</div>
+						<div>
+							@if (download?.Size > 0)
+							{
+								var percentage = (long)((decimal)download.Position / (decimal)download.Size * 100m);
+								<span>@percentage %</span>
+							}
+						</div>
+						<div>
+							@if (download != null)
+							{
+								<span>@(Utils.BytesToString(download.Position)) (@(Utils.BytesToString(download.Size)))</span>
+							}
+						</div>
+						<div>
+							@if (download != null)
+							{
+								<span>@(Utils.BytesToString(download.SpeedCurrent))/S (@(Utils.BytesToString(download.SpeedTotal))/S)</span>
+							}
+						</div>
 					}
 				</div>
 			}
 		</MudTd>
-		<MudTd>@torrent?.Status</MudTd>
-		<MudTd>@torrent?.Progress</MudTd>
+		<MudTd>
+			@if (torrent != null)
+			{
+				<span>@torrent?.Status (@torrent?.Progress %)</span>
+			}
+		</MudTd>
 		<MudTd>@(Utils.BytesToString(torrent?.Bytes))</MudTd>
 		<MudTd>
 			<MudIconButton Icon="@Icons.Material.Filled.Delete"
 						   Size="Size.Small"
-						   OnClick="() => _torrents.DeleteAsync(context)" />
+						   OnClick="() => _torrents.DeleteAsync(context.Hash)" />
+			<MudIconButton Icon="@Icons.Material.Filled.Download"
+						   Size="Size.Small"
+						   OnClick="() => _downloads.DownloadAsync(context.Hash)" />
 		</MudTd>
 	</RowTemplate>
 </MudTable>
@@ -51,6 +89,7 @@
 	{
 		_torrents.Changed += OnChanged;
 		_debrid.Changed += OnChanged;
+		_downloads.Changed += OnChanged;
 		await _debrid.ReloadAsync();
 	}
 
@@ -58,30 +97,25 @@
 	{
 		_torrents.Changed -= OnChanged;
 		_debrid.Changed -= OnChanged;
+		_downloads.Changed -= OnChanged;
 	}
 
 	private void OnChanged() => _ = InvokeAsync(StateHasChanged);
 
 	private IEnumerable<TorrentItem> GetItems()
 	{
-		return _torrents.Items
-			.OrderBy(x => x.Name)
-			.ThenBy(x => GetTorrent(x)?.Progress)
-			.ThenBy(x => GetTorrent(x)?.Status);
+		return _torrents.Items.Values
+		.OrderBy(x => x.Name)
+		.ThenBy(x => _debrid.GetTorrent(x.Hash)?.Progress)
+		.ThenBy(x => _debrid.GetTorrent(x.Hash)?.Status);
 	}
 
-	private Torrent GetTorrent(TorrentItem item)
+	private void Copy()
 	{
-		return _debrid.GetTorrents(item.Hash).FirstOrDefault();
-	}
-
-	private void OnCopyAll()
-	{
-		var items = GetItems();
-		var links = items
-			.Select(x => GetTorrent(x)?.Links)
-			.Where(x => x != null)
-			.SelectMany(x => x);
+		var links = GetItems()
+		.Select(x => _debrid.GetTorrent(x.Hash)?.Links)
+		.Where(x => x != null)
+		.SelectMany(x => x);
 		var linksAll = string.Join(Environment.NewLine, links);
 		_clipboard.SetText(linksAll);
 	}

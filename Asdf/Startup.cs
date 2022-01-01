@@ -44,7 +44,7 @@ namespace Asdf
 			ConfigureServices(builder.Services);
 
 			var app = builder.Build();
-			app.Services.GetRequiredService<TorrentsService>();
+			app.Services.GetRequiredService<DownloadsService>();
 			return app;
 		}
 
@@ -69,6 +69,7 @@ namespace Asdf
 
 			services.AddSingleton<TorrentsService>();
 			services.AddSingleton<DebridService>();
+			services.AddSingleton<DownloadsService>();
 		}
 	}
 }
