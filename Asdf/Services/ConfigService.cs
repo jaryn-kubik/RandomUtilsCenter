@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
 
 namespace Asdf.Services
 {
 	public class ConfigService
 	{
-		private string FilePath { get; set; }
+		private JsonHelper<ConfigService> Json { get; set; }
 
 		public string AllDebridToken { get; set; }
 		public string SimklClientID { get; set; }
@@ -20,29 +18,8 @@ namespace Asdf.Services
 		public int PingInterval { get; set; } = 1;
 		public int PingLatency { get; set; } = 20;
 
-		public void Save()
-		{
-			var data = JsonSerializer.SerializeToUtf8Bytes(this, new JsonSerializerOptions { WriteIndented = true });
-			File.WriteAllBytes(FilePath, data);
-		}
-
-		public static ConfigService Load()
-		{
-			var path = Path.Combine(Path.GetDirectoryName(typeof(Startup).Assembly.Location), ".config.json");
-			try
-			{
-				var data = File.ReadAllBytes(path);
-				var result = JsonSerializer.Deserialize<ConfigService>(data);
-				result.FilePath = path;
-				return result;
-			}
-			catch
-			{
-				var result = new ConfigService { FilePath = path };
-				result.Save();
-				return result;
-			}
-		}
+		public static ConfigService Load() => JsonHelper<ConfigService>.Load("config", x => x.Instance.Json = x);
+		public void Save() => Json.Save();
 
 		public class HtmlWatcherConfig
 		{

@@ -44,7 +44,9 @@ namespace Asdf
 			builder.Services.AddServerSideBlazor(x => x.DetailedErrors = true);
 			ConfigureServices(builder.Services);
 
-			return builder.Build();
+			var app = builder.Build();
+			app.Services.GetRequiredService<TorrentsService>();
+			return app;
 		}
 
 		private static void ConfigureServices(IServiceCollection services)
@@ -68,6 +70,8 @@ namespace Asdf
 
 			services.AddSingleton<ClipboardService>();
 			services.AddHostedService(x => x.GetRequiredService<ClipboardService>());
+
+			services.AddSingleton<TorrentsService>();
 		}
 	}
 }
