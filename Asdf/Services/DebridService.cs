@@ -1,4 +1,5 @@
-﻿using Asdf.Clients.AllDebrid;
+﻿using RDNET;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,58 +8,71 @@ namespace Asdf.Services
 {
 	public class DebridService
 	{
-		private static readonly List<DebridModel> _items = new List<DebridModel>();
-		private readonly AllDebridClient _client;
+		private readonly RdNetClient _client;
+		private readonly TimerSync _sync;
 
-		public DebridService(AllDebridClient client)
+		public DebridService()
 		{
-			_client = client;
+			_client = new RdNetClient();
+			_client.UseApiAuthentication("H6OPNEATJZCRJVGCBMVNTUZUSEGQ3JEYLW4JFGSR4Q6LMC7F5LLQ");
+			_sync = new(TimeSpan.FromSeconds(5), ReloadAsync);
 		}
 
-		public Task<string> LoginAsync()
+		public IList<Torrent> Items { get; private set; } = Array.Empty<Torrent>();
+		public event Action Changed;
+
+		public IEnumerable<Torrent> GetTorrents(string hash)
 		{
-			return _client.LoginAsync();
+			return Items.Where(x => string.Equals(x.Hash, hash, StringComparison.OrdinalIgnoreCase));
 		}
 
-		public async Task<IEnumerable<DebridModel>> GetItemsAsync(bool force = false)
+		public async Task ReloadAsync()
 		{
-			if (force)
+			await _sync.Run(async () =>
 			{
-				_items.Clear();
-			}
-
-			if (_items.Count > 0)
-			{
-				return _items;
-			}
-
-			var items = await _client.GetTorrentsAsync();
-			var result = items.magnets?.Select(x => new DebridModel
-			{
-				Id = x.id,
-				Name = x.filename,
-				SizeCurrent = x.statusCode < 3 ? x.downloaded : x.uploaded,
-				SizeTotal = x.size,
-				Status = x.status,
-				StatusType = x.statusCode < 4 ? DebridStatus.Processing : x.statusCode == 4 ? DebridStatus.Finished : DebridStatus.Error,
-				Files = x.links?.Select(y => new DebridFileModel
+				Items = (await _client.Torrents.GetAsync(null, 100));
+				if (Items.Count == 0 || Items.All(x => x.Status == "downloaded"))
 				{
-					Name = y.filename,
-					Link = y.link,
-					Size = y.size
-				})?.OrderBy(y => y.Name).ThenByDescending(y => y.Size)
+					_sync.Stop();
+				}
+				else
+				{
+					_sync.Start();
+				}
 			});
-
-			if (result != null)
-			{
-				_items.AddRange(result.OrderBy(x => x.StatusType).ThenBy(x => x.Name));
-			}
-			return _items;
+			Changed?.Invoke();
 		}
 
-		public Task DeleteAsync(DebridModel item)
+		public async Task AddMagnetAsync(string hash, string magnet)
 		{
-			return _client.DeleteAsync(item.Id);
+			await ReloadAsync();
+			if (!GetTorrents(hash).Any())
+			{
+				var result = await _client.Torrents.AddMagnetAsync(magnet);
+				var torrent = await _client.Torrents.GetInfoAsync(result.Id);
+				if (torrent.Status == "waiting_files_selection")
+				{
+					var files = torrent.Files.Where(x =>
+						!x.Path.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) &&
+						!x.Path.EndsWith(".nfo", StringComparison.OrdinalIgnoreCase)
+					);
+					await _client.Torrents.SelectFilesAsync(result.Id, files.Select(x => x.Id.ToString()).ToArray());
+				}
+			}
+			await ReloadAsync();
+		}
+
+		public async Task DeleteAsync(string hash)
+		{
+			var torrents = GetTorrents(hash).ToArray();
+			foreach (var torrent in torrents)
+			{
+				await _client.Torrents.DeleteAsync(torrent.Id);
+			}
+			if (torrents.Length > 0)
+			{
+				await ReloadAsync();
+			}
 		}
 	}
 }

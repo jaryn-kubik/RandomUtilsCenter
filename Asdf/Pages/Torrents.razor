@@ -1,0 +1,88 @@
+﻿@page "/torrents"
+@using RDNET
+@implements IDisposable
+@inject TorrentsService _torrents
+@inject DebridService _debrid
+@inject ClipboardService _clipboard
+
+<MudToolBar Class="gap-1">
+	<MudSpacer />
+	<MudButton OnClick="OnCopyAll" Variant="Variant.Filled" Color="Color.Primary">Copy All</MudButton>
+</MudToolBar>
+
+<MudTable Items="GetItems()" ReadOnly="true" Dense="true" HeaderClass="mud-theme-primary">
+	<HeaderContent>
+		<MudTh>Name</MudTh>
+		<MudTh>Status</MudTh>
+		<MudTh>Progress</MudTh>
+		<MudTh>Size</MudTh>
+		<MudTh></MudTh>
+	</HeaderContent>
+	<RowTemplate>
+		@{
+			var torrent = GetTorrent(context);
+		}
+		<MudTd>
+			<div>@context.Name</div>
+			@if (torrent?.Links?.Count > 0)
+			{
+				<div class="mt-2">
+					@foreach (var link in torrent.Links)
+					{
+						<a class="d-block" href="@("https://real-debrid.com/downloader?links=" + link)">@link</a>
+					}
+				</div>
+			}
+		</MudTd>
+		<MudTd>@torrent?.Status</MudTd>
+		<MudTd>@torrent?.Progress</MudTd>
+		<MudTd>@(Utils.BytesToString(torrent?.Bytes))</MudTd>
+		<MudTd>
+			<MudIconButton Icon="@Icons.Material.Filled.Delete"
+						   Size="Size.Small"
+						   OnClick="() => _torrents.DeleteAsync(context)" />
+		</MudTd>
+	</RowTemplate>
+</MudTable>
+
+@code
+{
+	protected override async Task OnInitializedAsync()
+	{
+		_torrents.Changed += OnChanged;
+		_debrid.Changed += OnChanged;
+		await _debrid.ReloadAsync();
+	}
+
+	public void Dispose()
+	{
+		_torrents.Changed -= OnChanged;
+		_debrid.Changed -= OnChanged;
+	}
+
+	private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+	private IEnumerable<TorrentItem> GetItems()
+	{
+		return _torrents.Items
+			.OrderBy(x => x.Name)
+			.ThenBy(x => GetTorrent(x)?.Progress)
+			.ThenBy(x => GetTorrent(x)?.Status);
+	}
+
+	private Torrent GetTorrent(TorrentItem item)
+	{
+		return _debrid.GetTorrents(item.Hash).FirstOrDefault();
+	}
+
+	private void OnCopyAll()
+	{
+		var items = GetItems();
+		var links = items
+			.Select(x => GetTorrent(x)?.Links)
+			.Where(x => x != null)
+			.SelectMany(x => x);
+		var linksAll = string.Join(Environment.NewLine, links);
+		_clipboard.SetText(linksAll);
+	}
+}

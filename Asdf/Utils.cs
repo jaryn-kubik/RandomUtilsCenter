@@ -5,8 +5,13 @@ namespace Asdf
 {
 	public static class Utils
 	{
-		public static string BytesToString(long value)
+		public static string BytesToString(long? value)
 		{
+			if (value == null)
+			{
+				return string.Empty;
+			}
+
 			var sizes = new[]
 			{
 				(1000 * 1000 * 1000L, "GB"),

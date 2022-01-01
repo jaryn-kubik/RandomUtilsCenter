@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -10,15 +9,16 @@ namespace Asdf.Services
 {
 	public class ClipboardService : IHostedService
 	{
-		private readonly ILogger<ClipboardService> _logger;
 		private MessageHandler _handler;
 
-		public ClipboardService(ILogger<ClipboardService> logger)
-		{
-			_logger = logger;
-		}
-
 		public event Action<string> Changed;
+
+		public void SetText(string text)
+		{
+			var thread = new Thread(() => Clipboard.SetText(text));
+			thread.SetApartmentState(ApartmentState.STA);
+			thread.Start();
+		}
 
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
@@ -36,7 +36,7 @@ namespace Asdf.Services
 
 		private void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
 		{
-			Utils.ShowMessage("Error", $"ClipboardService: {e.Exception}");
+			Utils.ShowMessage("Error - ClipboardService", $"{e.Exception}");
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken)
@@ -66,7 +66,14 @@ namespace Asdf.Services
 					if (!string.IsNullOrWhiteSpace(text) && text != _last)
 					{
 						_last = text;
-						_clipboard.Changed?.Invoke(text);
+						try
+						{
+							_clipboard.Changed?.Invoke(text);
+						}
+						catch (Exception ex)
+						{
+							Utils.ShowMessage("Error - ClipboardService", $"Text: {text}{Environment.NewLine}{ex}");
+						}
 					}
 				}
 				base.WndProc(ref msg);
