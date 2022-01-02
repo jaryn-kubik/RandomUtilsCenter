@@ -30,32 +30,26 @@
 			<div>@context.Name</div>
 			@if (torrent?.Links?.Count > 0)
 			{
-				<div class="mt-2" style="display: grid; grid-template-columns: 1fr 3em 3em 10em 15em; column-gap: 2em">
+				<div class="mt-2 px-2" style="display: grid; grid-template-columns: 1fr 3em 12em 15em; column-gap: 2em; justify-items: center">
 					@foreach (var link in torrent.Links)
 					{
 						var download = _downloads.GetDownload(link);
-						<a href="@("https://real-debrid.com/downloader?links=" + link)">@(download?.FileName ?? link)</a>
-						<div>
-							@if (download != null)
-							{
-								<span>@download.Done</span>
-
-							}
-						</div>
-						<div>
+						var css = download?.Done == true ? "mud-success-text" : download?.Done == false ? "mud-warning-text" : null;
+						<a class="@css" style="justify-self: start" href="@("https://real-debrid.com/downloader?links=" + link)">@(download?.FileName ?? link)</a>
+						<div class="@css">
 							@if (download?.Size > 0)
 							{
 								var percentage = (long)((decimal)download.Position / (decimal)download.Size * 100m);
 								<span>@percentage %</span>
 							}
 						</div>
-						<div>
+						<div class="@css">
 							@if (download != null)
 							{
 								<span>@(Utils.BytesToString(download.Position)) (@(Utils.BytesToString(download.Size)))</span>
 							}
 						</div>
-						<div>
+						<div class="@css">
 							@if (download != null)
 							{
 								<span>@(Utils.BytesToString(download.SpeedCurrent))/S (@(Utils.BytesToString(download.SpeedTotal))/S)</span>
