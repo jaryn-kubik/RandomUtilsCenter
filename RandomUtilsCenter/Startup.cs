@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
-using RandomUtilsCenter.Clients.Simkl;
-using RandomUtilsCenter.Clients.Tmdb;
 using RandomUtilsCenter.Services;
 using System;
 
@@ -53,10 +51,6 @@ namespace RandomUtilsCenter
 			services.AddMudServices();
 
 			services.AddSingleton(ConfigService.Load());
-
-			services.AddSingleton<ShowsService>();
-			services.AddHttpClient<SimklClient>(x => x.BaseAddress = new Uri(SimklClient.ApiUrl));
-			services.AddHttpClient<TmdbClient>(x => x.BaseAddress = new Uri(TmdbClient.ApiUrl));
 
 			services.AddSingleton<HtmlWatcherService>();
 			services.AddHostedService(x => x.GetRequiredService<HtmlWatcherService>());

@@ -6,11 +6,7 @@ namespace RandomUtilsCenter.Services
 	{
 		private JsonHelper<ConfigService> Json { get; set; }
 
-		public string AllDebridToken { get; set; }
-		public string SimklClientID { get; set; }
-		public string SimklClientSecret { get; set; }
-		public string SimklToken { get; set; }
-		public string TmdbApiKey { get; set; }
+		public string RealDebridApiKey { get; set; }
 
 		public List<HtmlWatcherConfig> HtmlWatcher { get; set; } = new List<HtmlWatcherConfig>();
 		public double HtmlWatcherInterval { get; set; } = 5;

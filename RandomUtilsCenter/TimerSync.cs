@@ -62,14 +62,14 @@ namespace RandomUtilsCenter
 			finally { _sync.Release(); }
 		}
 
-		public async Task Run(Func<Task> action)
+		public async Task RunAsync(Func<Task> action)
 		{
 			await _sync.WaitAsync();
 			try { await action(); }
 			finally { _sync.Release(); }
 		}
 
-		public async Task<T> Run<T>(Func<Task<T>> action)
+		public async Task<T> RunAsync<T>(Func<Task<T>> action)
 		{
 			await _sync.WaitAsync();
 			try { return await action(); }
