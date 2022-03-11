@@ -12,6 +12,11 @@
 	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="0.16.1" />
 		<PackageReference Include="MudBlazor" Version="6.0.7" />
+		<PackageReference Include="pythonnet" Version="3.0.0-preview2022-03-03" />
 		<PackageReference Include="RD.NET" Version="2.1.0" />
 	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Unzip SourceFiles="$(ProjectDir)python-3.10.2-embed-amd64.zip" DestinationFolder="$(OutDir)python" />
+	</Target>
 </Project>

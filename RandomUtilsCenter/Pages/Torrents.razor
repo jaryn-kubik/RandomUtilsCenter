@@ -99,18 +99,21 @@
 	private IEnumerable<TorrentItem> GetItems()
 	{
 		return _torrents.Items.Values
-		.OrderBy(x => x.Name)
-		.ThenBy(x => _debrid.GetTorrent(x.Hash)?.Progress)
-		.ThenBy(x => _debrid.GetTorrent(x.Hash)?.Status);
+			.OrderBy(x => x.Name)
+			.ThenBy(x => _debrid.GetTorrent(x.Hash)?.Progress)
+			.ThenBy(x => _debrid.GetTorrent(x.Hash)?.Status);
 	}
 
 	private void Copy()
 	{
 		var links = GetItems()
-		.Select(x => _debrid.GetTorrent(x.Hash)?.Links)
-		.Where(x => x != null)
-		.SelectMany(x => x);
+			.Select(x => _debrid.GetTorrent(x.Hash)?.Links)
+			.Where(x => x != null)
+			.SelectMany(x => x);
 		var linksAll = string.Join(Environment.NewLine, links);
-		_clipboard.SetText(linksAll);
+		if (!string.IsNullOrWhiteSpace(linksAll))
+		{
+			_clipboard.SetText(linksAll);
+		}
 	}
 }

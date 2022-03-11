@@ -64,6 +64,8 @@ namespace RandomUtilsCenter
 			services.AddSingleton<TorrentsService>();
 			services.AddSingleton<DebridService>();
 			services.AddSingleton<DownloadsService>();
+
+			services.AddSingleton<YtDlpService>();
 		}
 	}
 }
