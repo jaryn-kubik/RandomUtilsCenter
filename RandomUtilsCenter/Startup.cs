@@ -66,6 +66,8 @@ namespace RandomUtilsCenter
 			services.AddSingleton<DownloadsService>();
 
 			services.AddSingleton<YtDlpService>();
+
+			services.AddHostedService<InitHostedService>();
 		}
 	}
 }

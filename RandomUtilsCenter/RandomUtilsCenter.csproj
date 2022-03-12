@@ -16,7 +16,7 @@
 		<PackageReference Include="RD.NET" Version="2.1.0" />
 	</ItemGroup>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Unzip SourceFiles="$(ProjectDir)python-3.10.2-embed-amd64.zip" DestinationFolder="$(OutDir)python" />
-	</Target>
+	<ItemGroup>
+		<None Update="yt-dlp-wrapper.py" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
 </Project>
