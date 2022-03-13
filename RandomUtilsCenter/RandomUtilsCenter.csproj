@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
-		<TargetFramework>net6.0-windows</TargetFramework>
+		<TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<UseWindowsForms>true</UseWindowsForms>
 	</PropertyGroup>
@@ -11,9 +11,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="0.16.1" />
+		<PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
 		<PackageReference Include="MudBlazor" Version="6.0.7" />
 		<PackageReference Include="pythonnet" Version="3.0.0-preview2022-03-03" />
-		<PackageReference Include="RD.NET" Version="2.1.0" />
+		<PackageReference Include="RD.NET" Version="2.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>

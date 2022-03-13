@@ -10,15 +10,31 @@ namespace RandomUtilsCenter.Services
 	public class YtDlpService
 	{
 		private readonly ILogger<YtDlpService> _logger;
+		private IntPtr _threadState;
 
-		public YtDlpService(ILogger<YtDlpService> logger)
+		public YtDlpService(ILogger<YtDlpService> logger, ClipboardService clipboard)
 		{
 			_logger = logger;
+			clipboard.Register(OnClipboardAsync);
+		}
+
+		private Task OnClipboardAsync(string text)
+		{
+			text = text?.Trim() ?? string.Empty;
+			if (text.StartsWith("https://"))
+			{
+				var extractor = GetExtractor(text);
+				if (extractor != "Generic")
+				{
+					Utils.ShowToast(extractor, text);
+					Download(text);
+				}
+			}
+			return Task.CompletedTask;
 		}
 
 		public async Task UpdateAsync(CancellationToken cancellationToken)
 		{
-			var pica = Environment.GetEnvironmentVariable("path");
 			await Process.Start("python.exe", "-m pip install -U yt-dlp").WaitForExitAsync(cancellationToken);
 		}
 
@@ -26,13 +42,14 @@ namespace RandomUtilsCenter.Services
 		{
 			Runtime.PythonDLL = "python310.dll";
 			PythonEngine.Initialize();
+			_threadState = PythonEngine.BeginAllowThreads();
 
-			var logger = new YtDlpLogger(_logger).ToPython();
-			Call<bool>(x => x.Init(logger));
+			Call<bool>(x => x.Init(new YtDlpLogger(_logger).ToPython()));
 		}
 
 		public void Shutdown()
 		{
+			PythonEngine.EndAllowThreads(_threadState);
 			PythonEngine.Shutdown();
 		}
 
@@ -53,7 +70,7 @@ namespace RandomUtilsCenter.Services
 			}
 		}
 
-		private string GetExtractor(string url) => Call<string>(x => x.GetExtractor(url));
-		private int Download(string url) => Call<int>(x => x.Download(url));
+		private static string GetExtractor(string url) => Call<string>(x => x.GetExtractor(url));
+		private static int Download(string url) => Call<int>(x => x.Download(url));
 	}
 }

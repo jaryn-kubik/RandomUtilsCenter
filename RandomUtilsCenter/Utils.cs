@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RandomUtilsCenter
@@ -32,6 +34,14 @@ namespace RandomUtilsCenter
 		public static void ShowMessage(string title, string msg)
 		{
 			Task.Run(() => MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly));
+		}
+
+		public static void ShowToast(string title, string msg)
+		{
+			new ToastContentBuilder()
+				.AddText(title)
+				.AddText(msg)
+				.Show(x => x.ExpirationTime = DateTimeOffset.Now);
 		}
 	}
 }

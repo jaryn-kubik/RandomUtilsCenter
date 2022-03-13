@@ -15,7 +15,7 @@ namespace RandomUtilsCenter.Services
 		public TorrentsService(ClipboardService clipboard, DebridService debrid)
 		{
 			_items = JsonHelper<ConcurrentDictionary<string, TorrentItem>>.Load("torrents", x => new ConcurrentDictionary<string, TorrentItem>(x, StringComparer.OrdinalIgnoreCase));
-			clipboard.Changed += Clipboard_ChangedAsync;
+			clipboard.Register(OnClipboardAsync);
 			_debrid = debrid;
 		}
 
@@ -37,7 +37,7 @@ namespace RandomUtilsCenter.Services
 			_items.Save();
 		}
 
-		private async void Clipboard_ChangedAsync(string text)
+		private async Task OnClipboardAsync(string text)
 		{
 			text = text?.Trim() ?? string.Empty;
 			if (text.StartsWith("magnet:?"))
@@ -62,6 +62,8 @@ namespace RandomUtilsCenter.Services
 			item.Name = name ?? item.Name;
 			item.Magnet = magnet ?? item.Magnet;
 			_items.Save();
+
+			Utils.ShowToast("Torrent", name);
 			return item;
 		}
 	}

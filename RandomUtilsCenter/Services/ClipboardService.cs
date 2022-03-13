@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,9 +10,13 @@ namespace RandomUtilsCenter.Services
 {
 	public class ClipboardService : IHostedService
 	{
+		private readonly List<Func<string, Task>> _list = new();
 		private MessageHandler _handler;
 
-		public event Action<string> Changed;
+		public void Register(Func<string, Task> action)
+		{
+			_list.Add(action);
+		}
 
 		public void SetText(string text)
 		{
@@ -66,13 +71,20 @@ namespace RandomUtilsCenter.Services
 					if (!string.IsNullOrWhiteSpace(text) && text != _last)
 					{
 						_last = text;
-						try
+						text = text?.Trim() ?? string.Empty;
+						foreach (var item in _clipboard._list)
 						{
-							_clipboard.Changed?.Invoke(text);
-						}
-						catch (Exception ex)
-						{
-							Utils.ShowMessage("Error - ClipboardService", $"Text: {text}{Environment.NewLine}{ex}");
+							Task.Run(async () =>
+							{
+								try
+								{
+									await item(text);
+								}
+								catch (Exception ex)
+								{
+									Utils.ShowMessage("Error - ClipboardService", $"Text: {text}{Environment.NewLine}{ex}");
+								}
+							});
 						}
 					}
 				}

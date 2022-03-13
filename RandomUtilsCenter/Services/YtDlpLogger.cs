@@ -13,7 +13,7 @@ namespace RandomUtilsCenter.Services
 
 		public void debug(string msg)
 		{
-			_logger.LogInformation(msg);
+			_logger.LogTrace(msg);
 		}
 
 		public void warning(string msg)

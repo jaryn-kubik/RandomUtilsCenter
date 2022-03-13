@@ -4,7 +4,8 @@ def Init(logger):
 	global ydl
 	ydl = yt_dlp.YoutubeDL({
 		"outtmpl": "D:\\Downloads\\%(title)s.%(ext)s",
-		"logger": logger
+		"logger": logger,
+		"concurrent_fragment_downloads": 20
 	})
 	return True
 
