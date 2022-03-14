@@ -10,18 +10,19 @@ namespace RandomUtilsCenter.Services
 	public class YtDlpService
 	{
 		private readonly ILogger<YtDlpService> _logger;
+		private readonly CircuitsService _circuitsService;
 		private IntPtr _threadState;
 
-		public YtDlpService(ILogger<YtDlpService> logger, ClipboardService clipboard)
+		public YtDlpService(ILogger<YtDlpService> logger, CircuitsService circuitsService, ClipboardService clipboard)
 		{
 			_logger = logger;
+			_circuitsService = circuitsService;
 			clipboard.Register(OnClipboardAsync);
 		}
 
 		private Task OnClipboardAsync(string text)
 		{
-			text = text?.Trim() ?? string.Empty;
-			if (text.StartsWith("https://"))
+			if (_circuitsService.Any && text.StartsWith("https://"))
 			{
 				var extractor = GetExtractor(text);
 				if (extractor != "Generic")
@@ -35,7 +36,8 @@ namespace RandomUtilsCenter.Services
 
 		public async Task UpdateAsync(CancellationToken cancellationToken)
 		{
-			await Process.Start("python.exe", "-m pip install -U yt-dlp").WaitForExitAsync(cancellationToken);
+			var startInfo = new ProcessStartInfo("python.exe", "-m pip install -U yt-dlp") { CreateNoWindow = true };
+			await Process.Start(startInfo).WaitForExitAsync(cancellationToken);
 		}
 
 		public void Initialize()

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -68,6 +69,9 @@ namespace RandomUtilsCenter
 			services.AddSingleton<YtDlpService>();
 
 			services.AddHostedService<InitHostedService>();
+
+			services.AddSingleton<CircuitsService>();
+			services.AddSingleton<CircuitHandler>(x => x.GetRequiredService<CircuitsService>());
 		}
 	}
 }

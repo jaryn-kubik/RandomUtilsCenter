@@ -39,7 +39,6 @@ namespace RandomUtilsCenter.Services
 
 		private async Task OnClipboardAsync(string text)
 		{
-			text = text?.Trim() ?? string.Empty;
 			if (text.StartsWith("magnet:?"))
 			{
 				var parts = text.Substring("magnet:?".Length).Split('&', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
