@@ -29,7 +29,7 @@ namespace RandomUtilsCenter
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
-			builder.WebHost.ConfigureKestrel(y => y.ListenLocalhost(1337, z => z.UseHttps()));
+			builder.WebHost.ConfigureKestrel(y => y.ListenLocalhost(7331, z => z.UseHttps()));
 
 			builder.Logging.AddProvider(new LoggerProvider());
 			builder.Logging.SetMinimumLevel(LogLevel.Debug);
